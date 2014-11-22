@@ -37,16 +37,28 @@ class ProcessNode(Node):
 def buildGraph(fileName):
     f = open(fileName, 'r')
     lines = [line.strip() for line in f.readlines() if line != '\n']
-    fileChunks = [i for i, line in enumerate(lines) if line.startswith('Process:')]
+    groupChunks = [i for i, line in enumerate(lines) if line.startswith('Group')]
     processMap = {}
     fileMap = {}
+    for i, lineNum in enumerate(groupChunks):
+        if i == len(groupChunks) - 1:
+            linesForGroup = lines[lineNum:]
+        else:
+            linesForGroup = lines[lineNum:groupChunks[i+1]]
+        processLinesForGroup(linesForGroup, processMap, fileMap)
+    return processMap, fileMap
+
+def processLinesForGroup(linesForGroup, processMap, fileMap):
+    global processNumber
+
+    fileChunks = [i for i, line in enumerate(linesForGroup) if line.startswith("Process:")]
     for i, lineNum in enumerate(fileChunks):
         if i == len(fileChunks) - 1:
-            linesForFile = lines[lineNum:]
+            linesForFile = linesForGroup[lineNum:]
         else:
-            linesForFile = lines[lineNum:fileChunks[i+1]]
+            linesForFile = linesForGroup[lineNum:fileChunks[i+1]]
         processLinesForFile(linesForFile, processMap, fileMap)
-    return processMap, fileMap
+    processNumber += 1
 
 def processLinesForFile(linesForFile, processMap, fileMap):
     global processNumber
@@ -70,7 +82,6 @@ def processLinesForFile(linesForFile, processMap, fileMap):
         if line.startswith(executesPrefix):
             executes = [ln.strip() for ln in line[len(executesPrefix):].split(',')]
     processNode = ProcessNode(processName, processNumber)
-    processNumber += 1
     for fileToRead in reads:
         readFileNode = fileMap.get(fileToRead, Node(fileToRead))
         readFileNode.addToReads(processNode)
@@ -87,7 +98,7 @@ def processLinesForFile(linesForFile, processMap, fileMap):
         executeFileNode.addToExecutes(processNode)
         fileMap[fileToExecute] = executeFileNode
         processNode.addToExecutes(executeFileNode)
-    processMap[processNode.processNumber] = processNode
+    processMap[(processNode.processNumber, processNode.name)] = processNode
 
 
 processMap, fileMap =  buildGraph('config.txt')
