@@ -14,15 +14,6 @@ create_socket_dir() {
     chmod $perms $dirname
 }
 
-set_perms() {
-    local ownergroup="$1"
-    local perms="$2"
-    local pn="$3"
-
-    chown $ownergroup $pn
-    chmod $perms $pn
-}
-
 rm -rf /jail
 mkdir -p /jail
 cp -p index.html /jail
@@ -67,24 +58,13 @@ chmod a+rwxt /jail/tmp
 mkdir -p /jail/dev
 mknod /jail/dev/urandom c 1 9
 
-cp -r zoobar /jail/
-rm -rf /jail/zoobar/db
+mkdir -p /jail/app
+cp -r AutoPS /jail/
+cp -r zoobar /jail/app
+rm -rf /jail/app/zoobar/db
 
-python /jail/zoobar/zoodb.py init-person
-python /jail/zoobar/zoodb.py init-transfer
-python /jail/zoobar/zoodb.py init-cred
-python /jail/zoobar/zoodb.py init-bank
+python /jail/app/zoobar/zoodb.py init-person
+python /jail/app/zoobar/zoodb.py init-transfer
+python /jail/app/zoobar/zoodb.py init-cred
+python /jail/app/zoobar/zoodb.py init-bank
 
-set_perms 61013:61013 775 /jail/zoobar/
-set_perms 61020:61020 755 /jail/zoobar/index.cgi
-set_perms 61013:61013 775 /jail/zoobar/db/
-set_perms 61013:61013 775 /jail/zoobar/db/person/
-set_perms 61013:61013 775 /jail/zoobar/db/person/person.db
-set_perms 61015:61015 755 /jail/zoobar/db/transfer/
-set_perms 61015:61015 755 /jail/zoobar/db/transfer/transfer.db
-set_perms 61014:61014 700 /jail/zoobar/db/cred/
-set_perms 61014:61014 700 /jail/zoobar/db/cred/cred.db
-set_perms 61015:61015 700 /jail/zoobar/db/bank/
-set_perms 61015:61015 700 /jail/zoobar/db/bank/bank.db
-set_perms 61014:61013 700 /jail/zoobar/auth-server.py
-set_perms 61015:61013 700 /jail/zoobar/bank-server.py
