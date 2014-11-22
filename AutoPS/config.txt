@@ -1,25 +1,32 @@
-Process: auth.py
-Reads: db/person/person.db
-Writes: db/person/person.db
-Executes: db/person
+Group
+Process: zoobar/auth.py
+Reads: zoobar/db/person/person.db
+Writes: zoobar/db/person/person.db
+Executes: zoobar/db/person
 
-Process: bank.py
-Reads: db/person/person.db, db/transfer/transfer.db
-Writes: db/person/person.db, db/transfer/transfer.db
-Executes: db/person, db/transfer
+Group
+Process: zoobar/bank.py
+Reads: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
+Writes: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
+Executes: zoobar/db/person, zoobar/db/transfer
 
-Process: index.py
-Reads: login.py, db/person/person.db
-Writes: db/person/person.db
-Executes: db/person
+Group
+Process: zoobar/index.py
+Reads: zoobar/login.py, zoobar/db/person/person.db
+Writes: zoobar/db/person/person.db
+Executes: zoobar/db/person
 
-Process: login.py
-Reads: auth.py, bank.py, db/person/person.db
-Executes: db/person
+Group
+Process: zoobar/login.py
+Reads: zoobar/auth.py, zoobar/bank.py, zoobar/db/person/person.db
+Executes: zoobar/db/person
 
-Process: transfer.py
-Reads: login.py, bank.py
+Group
+Process: zoobar/transfer.py
+Reads: zoobar/login.py, zoobar/bank.py
 
-Process: users.py
-Reads: login.py, bank.py, db/person/person.db
-Executes: db/person
+Group
+Process: zoobar/users.py
+Reads: zoobar/login.py, zoobar/bank.py, zoobar/db/person/person.db
+Executes: zoobar/db/person
+

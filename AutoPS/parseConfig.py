@@ -21,17 +21,18 @@ class FileNode(Node):
     def __init__(self, name):
         super(FileNode, self).__init__(name)
     def __str__(self):
-        return "name: {0}, reads: {1}, writes: {2}, executes:{3}".format(self.name, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
+        return "name: {0}, reads: {1}, writes: {2}, executes:{3}".format(self.name, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
 
 class ProcessNode(Node):
-    def __init__(self, name, procNum):
+    def __init__(self, name, procNum, shouldStart):
         super(ProcessNode, self).__init__(name)
         self.processNumber = procNum
+        self.shouldStart = shouldStart
     def __hash__(self):
         return self.processNumber
     def __str__(self):
-        return "name: {0}, processNumber: {1}, reads: {2}, writes: {3}, executes:{4}".format(self.name, self.processNumber, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
+        return "name: {0}, processNumber: {1}, shouldStart: {2},  reads: {2}, writes: {3}, executes:{4}".format(self.name, self.processNumber, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
 
 def buildGraph(fileName):
@@ -63,8 +64,8 @@ def processLinesForGroup(linesForGroup, processMap, fileMap):
 def processLinesForFile(linesForFile, processMap, fileMap):
     global processNumber
 
-    fileName = None
     processName = None
+    shouldStart = False
     reads = []
     writes = []
     executes = []
@@ -75,13 +76,15 @@ def processLinesForFile(linesForFile, processMap, fileMap):
     for line in linesForFile:
         if line.startswith(processPrefix):
             processName = line[len(processPrefix):]
-        if line.startswith(readsPrefix):
+        elif line.startswith(readsPrefix):
             reads = [ln.strip() for ln in line[len(readsPrefix):].split(',')]
-        if line.startswith(writesPrefix):
+        elif line.startswith(writesPrefix):
             writes = [ln.strip() for ln in line[len(writesPrefix):].split(',')]
-        if line.startswith(executesPrefix):
+        elif line.startswith(executesPrefix):
             executes = [ln.strip() for ln in line[len(executesPrefix):].split(',')]
-    processNode = ProcessNode(processName, processNumber)
+        elif line.strip() == "Start":
+            shouldStart = True
+    processNode = ProcessNode(processName, processNumber, shouldStart)
     for fileToRead in reads:
         readFileNode = fileMap.get(fileToRead, Node(fileToRead))
         readFileNode.addToReads(processNode)
