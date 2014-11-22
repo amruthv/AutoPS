@@ -39,6 +39,10 @@ def setPermissions(configName, zeroOutDir):
     # go through and set acls for everything
     for fileNode in fileMap.values():
         setFilePermissions(fileNode)
+    
+    # spawn the processes
+    for processNode in processMap.values():
+        startProcess(processNode)        
 
 def setFilePermissions(fileNode):
     #aggregate permissions by calling process (process p might be in reads and writes) 
@@ -55,6 +59,13 @@ def setFilePermissions(fileNode):
     # actually invoke acl
     for processNum, permissions in processPermissions.items():
         subprocess.call(["sudo", "setfacl", "-m" "user:{0}:{1}".format(processNum, permissions), '/jail/app/' + fileNode.name])
+
+def startProcess(processNode):
+    if processNode.shouldStart:
+        pid = os.fork()
+        os.setgid(processNode.processNumber)
+        os.setuid(processNode.processNumber)
+        os.execv(processNode.name, [processNode.name] + processNode.args)
 
 setPermissions("/jail/AutoPS/config.txt", "/jail/app")
 chroot("/jail")

@@ -25,14 +25,15 @@ class FileNode(Node):
 
 
 class ProcessNode(Node):
-    def __init__(self, name, procNum, shouldStart):
+    def __init__(self, name, procNum, args, shouldStart):
         super(ProcessNode, self).__init__(name)
         self.processNumber = procNum
+        self.args = args
         self.shouldStart = shouldStart
     def __hash__(self):
         return self.processNumber
     def __str__(self):
-        return "name: {0}, processNumber: {1}, shouldStart: {2},  reads: {2}, writes: {3}, executes:{4}".format(self.name, self.processNumber, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
+        return "name: {0}, processNumber: {1}, args: {2} shouldStart: {3},  reads: {4}, writes: {5}, executes:{6}".format(self.name, self.processNumber, self.args, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
 
 def buildGraph(fileName):
@@ -66,16 +67,21 @@ def processLinesForFile(linesForFile, processMap, fileMap):
 
     processName = None
     shouldStart = False
+    args = []
     reads = []
     writes = []
     executes = []
     processPrefix = "Process: "
+    argsPrefix = "Args: "
     readsPrefix = "Reads: "
     writesPrefix = "Writes: "
     executesPrefix = "Executes: "
     for line in linesForFile:
         if line.startswith(processPrefix):
             processName = line[len(processPrefix):]
+        elif line.startswith(argsPrefix):
+            # note this doesn't work with escaped spaces..
+            args = line[len(argsPrefix):].strip().split(' ')
         elif line.startswith(readsPrefix):
             reads = [ln.strip() for ln in line[len(readsPrefix):].split(',')]
         elif line.startswith(writesPrefix):
@@ -84,7 +90,7 @@ def processLinesForFile(linesForFile, processMap, fileMap):
             executes = [ln.strip() for ln in line[len(executesPrefix):].split(',')]
         elif line.strip() == "Start":
             shouldStart = True
-    processNode = ProcessNode(processName, processNumber, shouldStart)
+    processNode = ProcessNode(processName, processNumber, args, shouldStart)
     for fileToRead in reads:
         readFileNode = fileMap.get(fileToRead, Node(fileToRead))
         readFileNode.addToReads(processNode)
