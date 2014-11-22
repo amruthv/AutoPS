@@ -1,0 +1,25 @@
+Process: auth.py
+Reads: db/person/person.db
+Writes: db/person/person.db
+Executes: db/person
+
+Process: bank.py
+Reads: db/person/person.db, db/transfer/transfer.db
+Writes: db/person/person.db, db/transfer/transfer.db
+Executes: db/person, db/transfer
+
+Process: index.py
+Reads: login.py, db/person/person.db
+Writes: db/person/person.db
+Executes: db/person
+
+Process: login.py
+Reads: auth.py, bank.py, db/person/person.db
+Executes: db/person
+
+Process: transfer.py
+Reads: login.py, bank.py
+
+Process: users.py
+Reads: login.py, bank.py, db/person/person.db
+Executes: db/person
