@@ -1,32 +1,25 @@
 Group
-Process: zoobar/auth.py
-Reads: zoobar/db/person/person.db
-Writes: zoobar/db/person/person.db
-Executes: zoobar/db/person
+Process: zookfs
 
 Group
-Process: zoobar/bank.py
-Reads: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
-Writes: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
-Executes: zoobar/db/person, zoobar/db/transfer
+Process: zookfs
+Start
+Reads: zoobar/templates/index.html, zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
 
 Group
-Process: zoobar/index.py
-Reads: zoobar/login.py, zoobar/db/person/person.db
-Writes: zoobar/db/person/person.db
-Executes: zoobar/db/person
+Process: zoobar/auth-server.py
+Start
+Reads: authsvc, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
+Executes: authsvc
 
 Group
-Process: zoobar/login.py
-Reads: zoobar/auth.py, zoobar/bank.py, zoobar/db/person/person.db
-Executes: zoobar/db/person
+Process: zoobar/bank-server.py
+Start
+Reads: bankx_svc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
+Writes: zoobar/db/transfer/
+Executes: banksvc
 
 Group
-Process: zoobar/transfer.py
-Reads: zoobar/login.py, zoobar/bank.py
-
-Group
-Process: zoobar/users.py
-Reads: zoobar/login.py, zoobar/bank.py, zoobar/db/person/person.db
-Executes: zoobar/db/person
-
+Process: zoobar/profile-server.py
+Reads: profilesvc, zoobar/rpclib.py, zoobar/sandboxlib.py, zoobar/bank_client.py, zoobar/zoodb.py, zoobar/bank.py, zoobar/debug.py, zoobar/auth_client.py
+Executes: profilesvc
