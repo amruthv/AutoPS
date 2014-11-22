@@ -16,10 +16,11 @@ create_socket_dir() {
 
 rm -rf /jail
 mkdir -p /jail
-cp -p index.html /jail
+mkdir -p /jail/app
+cp -p index.html /jail/app
 
-./chroot-copy.sh zookd /jail
-./chroot-copy.sh zookfs /jail
+./chroot-copy.sh zookd /jail/app
+./chroot-copy.sh zookfs /jail/app
 
 #./chroot-copy.sh /bin/bash /jail
 
@@ -47,10 +48,10 @@ cp /etc/resolv.conf /jail/etc/
 mkdir -p /jail/usr/share/zoneinfo
 cp -r /usr/share/zoneinfo/America /jail/usr/share/zoneinfo/
 
-create_socket_dir /jail/echosvc 61010:61010 755
-create_socket_dir /jail/authsvc 61014:61014 775
-create_socket_dir /jail/banksvc 61015:61015 775
-create_socket_dir /jail/profilesvc 61016:61016 775
+create_socket_dir /jail/app/echosvc 61010:61010 755
+create_socket_dir /jail/app/authsvc 61014:61014 775
+create_socket_dir /jail/app/banksvc 61015:61015 775
+create_socket_dir /jail/app/profilesvc 61016:61016 775
 
 mkdir -p /jail/tmp
 chmod a+rwxt /jail/tmp
@@ -60,7 +61,7 @@ mknod /jail/dev/urandom c 1 9
 
 mkdir -p /jail/app
 cp -r AutoPS /jail/
-cp -r zoobar /jail/app
+cp -r zoobar /jail/app/
 rm -rf /jail/app/zoobar/db
 
 python /jail/app/zoobar/zoodb.py init-person
