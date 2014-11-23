@@ -1,25 +1,46 @@
 Group
-Process: zookfs
+Run As: 0
+Process: zookld
+Start
+Args: zook.conf
+Executes: zookd, zookfs
 
 Group
+Run as: 50000
+Process: zookd
+Reads:
+Writes:
+Executes:
+
+Group
+Run as: 50002
 Process: zookfs
-Start
-Reads: zoobar/templates/index.html, zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
+Reads: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+Writes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+Executes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+
+Group
+Run as: 50001
+Process: zookfs
+Reads: zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
 
 Group
 Process: zoobar/auth-server.py
 Start
+Args: /authsvc/sock
 Reads: authsvc, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
 Executes: authsvc
 
 Group
 Process: zoobar/bank-server.py
 Start
-Reads: bankx_svc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
+Args: /banksvc/sock
+Reads: bank_svc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
 Writes: zoobar/db/transfer/
 Executes: banksvc
 
 Group
 Process: zoobar/profile-server.py
+Args: /profilesvc/sock
 Reads: profilesvc, zoobar/rpclib.py, zoobar/sandboxlib.py, zoobar/bank_client.py, zoobar/zoodb.py, zoobar/bank.py, zoobar/debug.py, zoobar/auth_client.py
 Executes: profilesvc
