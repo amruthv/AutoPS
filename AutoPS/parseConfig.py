@@ -16,7 +16,8 @@ class Node(object):
         self.executes.append(node)
     def __hash__(self):
         return self.name.__hash__()
-
+    def __repr__(self):
+        return self.__str__()
 class FileNode(Node):
     def __init__(self, name):
         super(FileNode, self).__init__(name)
@@ -33,6 +34,7 @@ class ProcessNode(Node):
     def __hash__(self):
         return self.processNumber
     def __str__(self):
+        return "name: {0}, processNumber: {1}".format(self.name, self.processNumber)
         return "name: {0}, processNumber: {1}, args: {2} shouldStart: {3},  reads: {4}, writes: {5}, executes:{6}".format(self.name, self.processNumber, self.args, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
 
@@ -50,18 +52,36 @@ def buildGraph(fileName):
         processLinesForGroup(linesForGroup, processMap, fileMap)
     return processMap, fileMap
 
+# HACK HACK ASSUME THEY HAVE REQUESTED PROCESS NUMBERS ENTRIES BEFORE THE ONES THAT CAN BE ASSIGNED ANY VALUE THIS WAY WE ASSUME THERES NO COLLISION
 def processLinesForGroup(linesForGroup, processMap, fileMap):
     global processNumber
-
+    runAsPrefix = "Run as: "
+    runAs = None
+    if linesForGroup[1].startswith(runAsPrefix):
+        runAs = int(linesForGroup[1][len(runAsPrefix):])
     fileChunks = [i for i, line in enumerate(linesForGroup) if line.startswith("Process:")]
     for i, lineNum in enumerate(fileChunks):
         if i == len(fileChunks) - 1:
             linesForFile = linesForGroup[lineNum:]
         else:
             linesForFile = linesForGroup[lineNum:fileChunks[i+1]]
+        # increment global processNumber reference until it is not being used by some requested process
+        while len([True for processNode in processMap.values() if processNode.processNumber == processNumber]) != 0:
+            processNumber += 1
         processLinesForFile(linesForFile, processMap, fileMap)
-    processNumber += 1
-
+    if runAs is None:
+        processNumber += 1
+    else:
+        justAdded = [processNode for processNode in processMap.values() if processNode.processNumber == processNumber]
+        #print justAdded
+        #print len(justAdded)
+        for node in justAdded:
+            #print 'before setting to runAs', node.processNumber
+            del processMap[(node.processNumber, node.name)]
+            node.processNumber = runAs
+            processMap[(node.processNumber, node.name)] = node
+            #print 'after setting to runAs', node.processNumber
+    print processMap 
 def processLinesForFile(linesForFile, processMap, fileMap):
     global processNumber
 
