@@ -11,19 +11,19 @@ def matchesWhitelist(prefix, whitelist, toCheck):
     return any(map(lambda whitelisted: toCheck.startswith(prefix + whitelisted), whitelist))
   
 def nullPermissions(prefix, whitelist):
-    print whitelist
     for root, dirs, files in os.walk(prefix):
-        print root + '/'
+        if root == prefix:
+            continue
         if matchesWhitelist(prefix, whitelist, root + "/"):
             continue 
-        os.chmod(root, 0o000)
+        os.chmod(root, 0o070)
         for f in files:
             if matchesWhitelist(prefix, whitelist, root + "/" + f):
                 continue
             if f == 'zook.conf':
-                os.chmod(root + "/" + f, 0o777)
+                os.chmod(root + "/" + f, 0o070)
             else:
-                os.chmod(root + "/" + f, 0o000)
+                os.chmod(root + "/" + f, 0o070)
 
 def setDefaultOwnerAndGroup(prefix, whitelist):
     for root, dirs, files in os.walk(prefix):
@@ -59,7 +59,8 @@ def setPermissions(configName, prefix):
     
     #chroot
     chroot(prefix)
-    
+    os.chdir('/')
+    print os.listdir('.') 
     # spawn the processes
     for processNode in processMap.values():
         startProcess(processNode)        

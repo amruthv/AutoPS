@@ -111,6 +111,7 @@ pid_t launch_svc(CONF *conf, const char *name)
     char *groups;
     long uid, gid;
 
+    warnx("Proces uid: %d", getuid());
     if (nsvcs)
         warnx("Launching service %d: %s", nsvcs, name);
     else

@@ -6,26 +6,27 @@ Process: zookld
 Start
 Args: zook.conf
 Reads: zook.conf
-Executes: zookd, zookfs
+Executes:
 
 Group
 Run as: 50000
 Process: zookd
 Reads:
 Writes:
-Executes:
+Executes: zookd
 
 Group
 Run as: 50002
 Process: zookfs
 Reads: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
 Writes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
-Executes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+Executes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zookfs
 
 Group
 Run as: 50001
 Process: zookfs
 Reads: zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
+Executes: zookfs
 
 Group
 Process: zoobar/auth-server.py
