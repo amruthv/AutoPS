@@ -27,7 +27,7 @@ static gid_t gids[MAX_GIDS];
 
 static int service_parse_cb(const char *, int, void *);
 static int group_parse_cb(const char *, int, void *);
-static pid_t launch_svc(CONF *, const chathandar aungr *);
+static pid_t launch_svc(CONF *, const char *);
 static int start_server(const char *);
 
 int main(int argc, char **argv)
@@ -92,8 +92,8 @@ int main(int argc, char **argv)
 
     /* launch non-http services */
     /* this is bank_svc, auth_svc, etc. We can probably take this out. */
-    if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
-        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
+    //if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
+    //    CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
 
     NCONF_free(conf);
 
@@ -106,7 +106,8 @@ pid_t launch_svc(CONF *conf, const char *name)
 {
     int fds[2], i;
     pid_t pid;
-    char *cmd, *args, *argv[32] = {0}, **ap, *dir;
+    char *cmd, *args, *argv[32] = {0}, **ap;
+    // char *dir;
     char *groups;
     long uid, gid;
 
@@ -175,13 +176,13 @@ pid_t launch_svc(CONF *conf, const char *name)
     }
 
     /* Get jail directory from conf and chroot into that directory */
-    if ((dir = NCONF_get_string(conf, name, "dir")))
-    {
-        /* chroot into dir */
-        warnx("chrooting into %s for service %s", dir, name);
-        chdir("/jail");
-        chroot(dir);
-    }
+    //if ((dir = NCONF_get_string(conf, name, "dir")))
+    //{
+    //    /* chroot into dir */
+    //    warnx("chrooting into %s for service %s", dir, name);
+    //    chdir("/jail");
+    //    chroot(dir);
+    //}
 
     /* Get uid from conf and assign it to the child process (everything before this needs root) */
     if (NCONF_get_number_e(conf, name, "uid", &uid))

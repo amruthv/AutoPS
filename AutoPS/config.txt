@@ -1,8 +1,9 @@
 Group
-Run As: 0
+Run as: 0
 Process: zookld
 Start
 Args: zook.conf
+Reads: zook.conf
 Executes: zookd, zookfs
 
 Group
@@ -35,7 +36,7 @@ Group
 Process: zoobar/bank-server.py
 Start
 Args: /banksvc/sock
-Reads: bank_svc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
+Reads: banksvc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
 Writes: zoobar/db/transfer/
 Executes: banksvc
 

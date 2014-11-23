@@ -9,9 +9,15 @@ def chroot(path):
   
 def nullPermissions(d):
     for root, dirs, files in os.walk(d):
-        os.chmod(root, 0o000)
+        if root == d:
+            os.chmod(root,0o001)
+        else:
+            os.chmod(root, 0o000)
         for f in files:
-            os.chmod(root + "/" + f, 0o000)
+            if f == 'zook.conf':
+                os.chmod(root + "/" + f, 0o777)
+            else:
+                os.chmod(root + "/" + f, 0o000)
 
 def setDefaultOwnerAndGroup(d):
     for root, dirs, files in os.walk(d):
@@ -63,9 +69,13 @@ def setFilePermissions(fileNode):
 def startProcess(processNode):
     if processNode.shouldStart:
         pid = os.fork()
+        print 'pid=',pid
+        os.chmod("/jail/app/" + processNode.name, 0o100)
         os.setgid(processNode.processNumber)
         os.setuid(processNode.processNumber)
-        os.execv(processNode.name, [processNode.name] + processNode.args)
+        print 'uid of process:', os.getuid()
+        print "trying to run: " + "/jail/app/" + processNode.name 
+        os.execv(processNode.name, ["/jail/app/" + processNode.name] + processNode.args)
 
 setPermissions("/jail/AutoPS/config.txt", "/jail/app")
 chroot("/jail")

@@ -129,7 +129,7 @@ def processLinesForFile(linesForFile, processMap, fileMap):
         processNode.addToExecutes(executeFileNode)
     processMap[(processNode.processNumber, processNode.name)] = processNode
 
-
-processMap, fileMap =  buildGraph('config.txt')
-for name in processMap.keys():
-    print processMap[name]
+if __name__ == '__main__':
+    processMap, fileMap =  buildGraph('config.txt')
+    for name in processMap.keys():
+        print processMap[name]

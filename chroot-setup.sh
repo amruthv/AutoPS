@@ -19,6 +19,8 @@ mkdir -p /jail
 mkdir -p /jail/app
 cp -p index.html /jail/app
 
+cp zook.conf /jail/app
+./chroot-copy.sh zookld /jail/app
 ./chroot-copy.sh zookd /jail/app
 ./chroot-copy.sh zookfs /jail/app
 
@@ -59,7 +61,6 @@ chmod a+rwxt /jail/tmp
 mkdir -p /jail/dev
 mknod /jail/dev/urandom c 1 9
 
-mkdir -p /jail/app
 cp -r AutoPS /jail/
 cp -r zoobar /jail/app/
 rm -rf /jail/app/zoobar/db
