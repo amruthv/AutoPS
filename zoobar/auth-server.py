@@ -14,7 +14,7 @@ class AuthRpcServer(rpclib.RpcServer):
     def rpc_check_token(self, username, token):
         return auth.check_token(username, token)
         
-(_, dummy_zookld_fd, sockpath) = sys.argv
+(_, sockpath) = sys.argv
 
 s = AuthRpcServer()
 s.run_sockpath_fork(sockpath)
