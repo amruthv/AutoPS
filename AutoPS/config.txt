@@ -18,30 +18,33 @@ Executes: zookd
 Group
 Run as: 50002
 Process: zookfs
-Reads: zoobar, zoobar/templates, zoobar/index.cgi, zoobar/__init__.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
-Writes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
-Executes: zoobar, zoobar/index.cgi, zoobar/__init__.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zookfs
+Reads: zoobar, zoobar/debug.py, zoobar/templates, zoobar/index.cgi, zoobar/__init__.py, zoobar/zoodb.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/auth_client.py, zoobar/auth.py, zoobar/bank_client.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zoobar/rpclib.py, zoobar/pbkdf2.py, zoobar/bank.py
+
+Writes: zoobar/index.cgi, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+
+Executes: zoobar, zoobar/index.cgi, zoobar/__init__.py, zoobar/templates
 
 Group
 Run as: 50001
 Process: zookfs
-Reads: zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
-Executes: zookfs
+Reads: zoobar, zoobar/media, zoobar/templates, zoobar/templates/index.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
+Executes: zookfs, zoobar, zoobar/media, zoobar/templates
 
 Group
 Process: zoobar/auth-server.py
 Start
 Args: /authsvc/sock
-Reads: authsvc, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
-Executes: authsvc
+Reads: authsvc, authsvc/sock, zoobar, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
+Writes: authsvc/sock
+Executes: authsvc, zoobar
 
 Group
 Process: zoobar/bank-server.py
 Start
 Args: /banksvc/sock
-Reads: banksvc, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
-Writes: zoobar/db/transfer/
-Executes: banksvc
+Reads: banksvc, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
+Writes: zoobar/db/transfer
+Executes: banksvc, zoobar, zoobar/db, zoobar/db/transfer
 
 Group
 Process: zoobar/profile-server.py

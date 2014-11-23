@@ -46,7 +46,6 @@ class ProcessNode(Node):
 def getWhitelist(lines):
     whitelistPrefix = "Whitelist: "
     whitelistlines = [line.strip() for line in lines if line.startswith("Whitelist: ")]
-    print 'whitelistlines', whitelistlines
     assert len(whitelistlines) == 0 or len(whitelistlines) == 1
     if len(whitelistlines) == 0:
         return []
@@ -93,15 +92,10 @@ def processLinesForGroup(linesForGroup, processMap, fileMap):
         processNumber += 1
     else:
         justAdded = [processNode for processNode in processMap.values() if processNode.processNumber == processNumber]
-        #print justAdded
-        #print len(justAdded)
         for node in justAdded:
-            #print 'before setting to runAs', node.processNumber
             del processMap[(node.processNumber, node.name)]
             node.processNumber = runAs
             processMap[(node.processNumber, node.name)] = node
-            #print 'after setting to runAs', node.processNumber
-    print processMap 
 def processLinesForFile(linesForFile, processMap, fileMap):
     global processNumber
 
@@ -151,7 +145,6 @@ def processLinesForFile(linesForFile, processMap, fileMap):
 
 if __name__ == '__main__':
     configInfo =  processConfig('config.txt')
-    print 'whitelist', configInfo.whitelist
     processMap = configInfo.processMap
-    for name in processMap.keys():
-        print processMap[name]
+    #for name in processMap.keys():
+    #    print processMap[name]

@@ -60,9 +60,11 @@ def setPermissions(configName, prefix):
     #chroot
     chroot(prefix)
     os.chdir('/')
-    print os.listdir('.') 
+    
+    print processMap.values()
     # spawn the processes
     for processNode in processMap.values():
+        print 'processing', processNode.name
         startProcess(processNode)        
 
 def setFilePermissions(prefix, fileNode):
@@ -82,9 +84,12 @@ def setFilePermissions(prefix, fileNode):
         subprocess.call(["sudo", "setfacl", "-m" "user:{0}:{1}".format(processNum, permissions), prefix + fileNode.name])
 
 def startProcess(processNode):
+    if processNode.name == "zookld":
+        return
     if processNode.shouldStart:
         pid = os.fork()
-        print 'pid=',pid
+        if not pid == 0:
+            return
         os.chmod(processNode.name, 0o100)
         os.setgid(processNode.processNumber)
         os.setuid(processNode.processNumber)
