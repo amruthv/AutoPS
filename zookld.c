@@ -57,18 +57,18 @@ int main(int argc, char **argv)
     }*/
 
     /* http server port, default 80 */
-    if (!(portstr = NCONF_get_string(conf, "zook", "port")))
-        portstr = "80";
+    //if (!(portstr = NCONF_get_string(conf, "zook", "port")))
+    portstr = "8080";
     sockfd = start_server(portstr);
     warnx("Listening on port %s", portstr);
     signal(SIGCHLD, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
 
     /* launch the dispatch daemon */
-    //disppid = launch_svc(conf, "zookd");
+    disppid = launch_svc("zookd");
     /* launch http services */
-    //if ((svcs = NCONF_get_string(conf, "zook", "http_svcs")))
-    //    CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
+    if ((svcs = NCONF_get_string(conf, "zook", "http_svcs")))
+        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
 
     /* send the server socket to zookd */
     //TODO: NEED TO MAKE SURE zookd IS RUNNING BEFORE WE DO THIS.
@@ -88,107 +88,107 @@ int main(int argc, char **argv)
     close(svcfds[0]);
 
     /* launch non-http services */
-    /*if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
-        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
+    //if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
+    //    CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
 
-    NCONF_free(conf);*/
+    NCONF_free(conf);
 
     /* wait for zookd */
     waitpid(disppid, &status, 0);
 }
 
 /* launch a service */
-// pid_t launch_svc(CONF *conf, const char *name)
-// {
-//     int fds[2], i;
-//     pid_t pid;
-//     char *cmd, *args, *argv[32] = {0}, **ap, *dir;
-//     char *groups;
-//     long uid, gid;
+pid_t launch_svc(CONF *conf, const char *name)
+ {
+     int fds[2], i;
+     pid_t pid;
+     char *cmd, *args, *argv[32] = {0}, **ap, *dir;
+     char *groups;
+     long uid, gid;
 
-//     if (nsvcs)
-//         warnx("Launching service %d: %s", nsvcs, name);
-//     else
-//         warnx("Launching %s", name);
+     if (nsvcs)
+         warnx("Launching service %d: %s", nsvcs, name);
+     else
+         warnx("Launching %s", name);
 
-//     if (!(cmd = NCONF_get_string(conf, name, "cmd")))
-//         errx(1, "`cmd' missing in [%s]", name);
+     if (!(cmd = NCONF_get_string(conf, name, "cmd")))
+         errx(1, "`cmd' missing in [%s]", name);
 
-//     if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds))
-//         err(1, "socketpair");
+     if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds))
+         err(1, "socketpair");
 
-//     switch ((pid = fork()))
-//     {
-//     case -1: /* error */
-//         err(1, "fork");
-//     case 0:  /* child */
-//         close(fds[0]);
-//         break;
-//     default: /* parent */
-//         warnx("%s: pid %d", name, pid);
-//         close(fds[1]);
-//         svcfds[nsvcs] = fds[0];
-//         ++nsvcs;
-//         return pid;
-//     }
+     switch ((pid = fork()))
+     {
+     case -1: /* error */
+         err(1, "fork");
+     case 0:  /* child */
+         close(fds[0]);
+         break;
+     default: /* parent */
+         warnx("%s: pid %d", name, pid);
+         close(fds[1]);
+         svcfds[nsvcs] = fds[0];
+         ++nsvcs;
+         return pid;
+     }
 
-//     /* child */
-//     argv[0] = cmd;
-//     /* argv[1] is used by svc to receive data from zookd */
-//     asprintf(&argv[1], "%d", fds[1]);
+     /* child */
+     argv[0] = cmd;
+     /* argv[1] is used by svc to receive data from zookd */
+     asprintf(&argv[1], "%d", fds[1]);
 
-//     /* split extra arguments */
-//     if ((args = NCONF_get_string(conf, name, "args")))
-//     {
-//         for (ap = &argv[2]; (*ap = strsep(&args, " \t")) != NULL; )
-//             if (**ap != '\0')
-//                 if (++ap >= &argv[31])
-//                     break;
-//     }
+     /* split extra arguments */
+     if ((args = NCONF_get_string(conf, name, "args")))
+     {
+         for (ap = &argv[2]; (*ap = strsep(&args, " \t")) != NULL; )
+             if (**ap != '\0')
+                 if (++ap >= &argv[31])
+                     break;
+     }
 
-//     if (NCONF_get_number_e(conf, name, "gid", &gid))
-//     {
-//         /* change real, effective, and saved gid to gid */
-//         warnx("setgid %ld", gid);
-//         setresgid(gid,gid,gid);
-//     }
+     if (NCONF_get_number_e(conf, name, "gid", &gid))
+     {
+         /* change real, effective, and saved gid to gid */
+         warnx("setgid %ld", gid);
+         setresgid(gid,gid,gid);
+     }
 
-//     if ((groups = NCONF_get_string(conf, name, "extra_gids")))
-//     {
-//         ngids = 0;
-//         CONF_parse_list(groups, ',', 1, &group_parse_cb, NULL);
-//         gid_t gidsForProcess[ngids];
-//         /* set the grouplist to gids */
-//         for (i = 0; i < ngids; i++)
-//         {
-//             warnx("extra gid %d", gids[i]);
-//             gidsForProcess[i] = gids[i];
-//         }
-        
-//         setgroups(ngids, gidsForProcess);
-//     }
+     if ((groups = NCONF_get_string(conf, name, "extra_gids")))
+     {
+         ngids = 0;
+         CONF_parse_list(groups, ',', 1, &group_parse_cb, NULL);
+         gid_t gidsForProcess[ngids];
+         /* set the grouplist to gids */
+         for (i = 0; i < ngids; i++)
+         {
+             warnx("extra gid %d", gids[i]);
+             gidsForProcess[i] = gids[i];
+         }
+      
+         setgroups(ngids, gidsForProcess);
+     }
 
-//     if ((dir = NCONF_get_string(conf, name, "dir")))
-//     {
-//         /* chroot into dir */
-//         warnx("chrooting into %s for service %s", dir, name);
-//         chdir("/jail");
-//         chroot(dir);
-//     }
+     //if ((dir = NCONF_get_string(conf, name, "dir")))
+     //{
+     //    /* chroot into dir */
+     //    warnx("chrooting into %s for service %s", dir, name);
+     //    chdir("/jail");
+     //    chroot(dir);
+     //}
 
-//     if (NCONF_get_number_e(conf, name, "uid", &uid))
-//     {
-//         /* change real, effective, and saved uid to uid */
-//         warnx("setuid %ld", uid);
-//         setresuid(uid, uid, uid);
-//     }
+     if (NCONF_get_number_e(conf, name, "uid", &uid))
+     {
+         /* change real, effective, and saved uid to uid */
+         warnx("setuid %ld", uid);
+         setresuid(uid, uid, uid);
+     }
 
-//     signal(SIGCHLD, SIG_DFL);
-//     signal(SIGPIPE, SIG_DFL);
+     signal(SIGCHLD, SIG_DFL);
+     signal(SIGPIPE, SIG_DFL);
 
-//     execv(argv[0], argv);
-//     err(1, "execv %s %s", argv[0], argv[1]);
-// }
+     execv(argv[0], argv);
+     err(1, "execv %s %s", argv[0], argv[1]);
+ }
 
 // static int service_parse_cb(const char *name, int len, void *arg)
 // {
