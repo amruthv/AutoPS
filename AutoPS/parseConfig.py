@@ -1,6 +1,11 @@
 processNumber = 61000
 RESERVEDPROCESS = 60000
 
+class ConfigInformation(object):
+    def __init__(self, processMap, fileMap, whitelist):
+        self.processMap = processMap
+        self.fileMap = fileMap
+        self.whitelist = whitelist
 
 class Node(object):
     def __init__(self, name):
@@ -38,9 +43,24 @@ class ProcessNode(Node):
         return "name: {0}, processNumber: {1}, args: {2} shouldStart: {3},  reads: {4}, writes: {5}, executes:{6}".format(self.name, self.processNumber, self.args, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
 
-def buildGraph(fileName):
+def getWhitelist(lines):
+    whitelistPrefix = "Whitelist: "
+    whitelistlines = [line.strip() for line in lines if line.startswith("Whitelist: ")]
+    print 'whitelistlines', whitelistlines
+    assert len(whitelistlines) == 0 or len(whitelistlines) == 1
+    if len(whitelistlines) == 0:
+        return []
+    whitelist = [x.strip() for x in whitelistlines[0][len(whitelistPrefix):].split(',')]
+    return whitelist
+
+def processConfig(fileName):
     f = open(fileName, 'r')
     lines = [line.strip() for line in f.readlines() if line != '\n']
+    whitelist = getWhitelist(lines)
+    processMap, fileMap = processGroups(lines) 
+    return ConfigInformation(processMap, fileMap, whitelist)
+
+def processGroups(lines):
     groupChunks = [i for i, line in enumerate(lines) if line.startswith('Group')]
     processMap = {}
     fileMap = {}
@@ -130,6 +150,8 @@ def processLinesForFile(linesForFile, processMap, fileMap):
     processMap[(processNode.processNumber, processNode.name)] = processNode
 
 if __name__ == '__main__':
-    processMap, fileMap =  buildGraph('config.txt')
+    configInfo =  processConfig('config.txt')
+    print 'whitelist', configInfo.whitelist
+    processMap = configInfo.processMap
     for name in processMap.keys():
         print processMap[name]

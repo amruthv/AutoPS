@@ -1,3 +1,5 @@
+Whitelist: usr/, dev/, etc/, tmp/, lib/
+
 Group
 Run as: 0
 Process: zookld

@@ -16,13 +16,12 @@ create_socket_dir() {
 
 rm -rf /jail
 mkdir -p /jail
-mkdir -p /jail/app
-cp -p index.html /jail/app
+cp -p index.html /jail
 
-cp zook.conf /jail/app
-./chroot-copy.sh zookld /jail/app
-./chroot-copy.sh zookd /jail/app
-./chroot-copy.sh zookfs /jail/app
+cp zook.conf /jail
+./chroot-copy.sh zookld /jail
+./chroot-copy.sh zookd /jail
+./chroot-copy.sh zookfs /jail
 
 #./chroot-copy.sh /bin/bash /jail
 
@@ -42,6 +41,11 @@ cp -r /lib/resolvconf /jail/lib
 mkdir -p /jail/usr/local/lib
 cp -r /usr/local/lib/python2.7 /jail/usr/local/lib
 
+#bring in useradd and groupadd
+mkdir -p /jail/usr/sbin/
+cp /usr/sbin/useradd /jail/usr/sbin/
+cp /usr/sbin/groupadd /jail/usr/sbin/
+
 mkdir -p /jail/etc
 cp /etc/localtime /jail/etc/
 cp /etc/timezone /jail/etc/
@@ -50,10 +54,10 @@ cp /etc/resolv.conf /jail/etc/
 mkdir -p /jail/usr/share/zoneinfo
 cp -r /usr/share/zoneinfo/America /jail/usr/share/zoneinfo/
 
-create_socket_dir /jail/app/echosvc 61010:61010 755
-create_socket_dir /jail/app/authsvc 61014:61014 775
-create_socket_dir /jail/app/banksvc 61015:61015 775
-create_socket_dir /jail/app/profilesvc 61016:61016 775
+create_socket_dir /jail/echosvc 61010:61010 755
+create_socket_dir /jail/authsvc 61014:61014 775
+create_socket_dir /jail/banksvc 61015:61015 775
+create_socket_dir /jail/profilesvc 61016:61016 775
 
 mkdir -p /jail/tmp
 chmod a+rwxt /jail/tmp
@@ -62,11 +66,11 @@ mkdir -p /jail/dev
 mknod /jail/dev/urandom c 1 9
 
 cp -r AutoPS /jail/
-cp -r zoobar /jail/app/
-rm -rf /jail/app/zoobar/db
+cp -r zoobar /jail/
+rm -rf /jail/zoobar/db
 
-python /jail/app/zoobar/zoodb.py init-person
-python /jail/app/zoobar/zoodb.py init-transfer
-python /jail/app/zoobar/zoodb.py init-cred
-python /jail/app/zoobar/zoodb.py init-bank
+python /jail/zoobar/zoodb.py init-person
+python /jail/zoobar/zoodb.py init-transfer
+python /jail/zoobar/zoodb.py init-cred
+python /jail/zoobar/zoodb.py init-bank
 
