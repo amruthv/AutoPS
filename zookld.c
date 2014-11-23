@@ -27,14 +27,14 @@ static gid_t gids[MAX_GIDS];
 
 static int service_parse_cb(const char *, int, void *);
 static int group_parse_cb(const char *, int, void *);
-static pid_t launch_svc(CONF *, const char *);
+static pid_t launch_svc(CONF *, const chathandar aungr *);
 static int start_server(const char *);
 
 int main(int argc, char **argv)
 {
-    //char *filename = ZOOK_CONF;
-    //CONF *conf;
-    //long eline = 0;
+    char *filename = ZOOK_CONF;
+    CONF *conf;
+    long eline = 0;
     char *portstr, *svcs;
     int sockfd;
     pid_t disppid;
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
        http://www.openssl.org/docs/apps/config.html
      */
 
-    /*if (argc > 1)
+    if (argc > 1)
         filename = argv[1];
     conf = NCONF_new(NULL);
     if (!NCONF_load(conf, filename, &eline))
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
             errx(1, "Failed parsing %s:%ld", filename, eline);
         else
             errx(1, "Failed opening %s", filename);
-    }*/
+    }
 
     /* http server port, default 80 */
     //if (!(portstr = NCONF_get_string(conf, "zook", "port")))
@@ -65,18 +65,21 @@ int main(int argc, char **argv)
     signal(SIGPIPE, SIG_IGN);
 
     /* launch the dispatch daemon */
-    disppid = launch_svc("zookd");
+    disppid = launch_svc(conf, "zookd");
+
     /* launch http services */
+    /* this is static_svc and dynamic_svc; i.e. zookfs stuff */
     if ((svcs = NCONF_get_string(conf, "zook", "http_svcs")))
-        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
+       CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
 
     /* send the server socket to zookd */
-    //TODO: NEED TO MAKE SURE zookd IS RUNNING BEFORE WE DO THIS.
     if (sendfd(svcfds[0], &nsvcs, sizeof(nsvcs), sockfd) < 0)
         err(1, "sendfd to zookd");
     close(sockfd);
 
     /* send all svc sockets with their url patterns to http services */
+    /* This is for zookfs, dynamic_svc, and static_svc. This is needed if we are going to 
+     * continue launching zookfs (i.e. dynamic_svc and static_svc) from zookld */
     for (i = 1; i < nsvcs; ++i)
     {
         char *url = NCONF_get_string(conf, svcnames[i], "url");
@@ -88,8 +91,9 @@ int main(int argc, char **argv)
     close(svcfds[0]);
 
     /* launch non-http services */
-    //if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
-    //    CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf);
+    /* this is bank_svc, auth_svc, etc. We can probably take this out. */
+    if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
+        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
 
     NCONF_free(conf);
 
@@ -99,125 +103,131 @@ int main(int argc, char **argv)
 
 /* launch a service */
 pid_t launch_svc(CONF *conf, const char *name)
- {
-     int fds[2], i;
-     pid_t pid;
-     char *cmd, *args, *argv[32] = {0}, **ap, *dir;
-     char *groups;
-     long uid, gid;
+{
+    int fds[2], i;
+    pid_t pid;
+    char *cmd, *args, *argv[32] = {0}, **ap, *dir;
+    char *groups;
+    long uid, gid;
 
-     if (nsvcs)
-         warnx("Launching service %d: %s", nsvcs, name);
-     else
-         warnx("Launching %s", name);
+    if (nsvcs)
+        warnx("Launching service %d: %s", nsvcs, name);
+    else
+        warnx("Launching %s", name);
 
-     if (!(cmd = NCONF_get_string(conf, name, "cmd")))
-         errx(1, "`cmd' missing in [%s]", name);
+    if (!(cmd = NCONF_get_string(conf, name, "cmd")))
+        errx(1, "`cmd' missing in [%s]", name);
 
-     if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds))
-         err(1, "socketpair");
+    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds))
+        err(1, "socketpair");
 
-     switch ((pid = fork()))
-     {
-     case -1: /* error */
-         err(1, "fork");
-     case 0:  /* child */
-         close(fds[0]);
-         break;
-     default: /* parent */
-         warnx("%s: pid %d", name, pid);
-         close(fds[1]);
-         svcfds[nsvcs] = fds[0];
-         ++nsvcs;
-         return pid;
-     }
+    switch ((pid = fork()))
+    {
+    case -1: /* error */
+        err(1, "fork");
+    case 0:  /* child */
+        close(fds[0]);
+        break;
+    default: /* parent */
+        warnx("%s: pid %d", name, pid);
+        close(fds[1]);
+        svcfds[nsvcs] = fds[0];
+        ++nsvcs;
+        return pid;
+    }
 
-     /* child */
-     argv[0] = cmd;
-     /* argv[1] is used by svc to receive data from zookd */
-     asprintf(&argv[1], "%d", fds[1]);
+    /* child (the function returns in the parent case, so the parent executes none of this) */
+    argv[0] = cmd;
+    /* argv[1] is used by svc to receive data from zookd */
+    asprintf(&argv[1], "%d", fds[1]);
 
-     /* split extra arguments */
-     if ((args = NCONF_get_string(conf, name, "args")))
-     {
-         for (ap = &argv[2]; (*ap = strsep(&args, " \t")) != NULL; )
-             if (**ap != '\0')
-                 if (++ap >= &argv[31])
-                     break;
-     }
+    /* split extra arguments */
+    if ((args = NCONF_get_string(conf, name, "args")))
+    {
+        for (ap = &argv[2]; (*ap = strsep(&args, " \t")) != NULL; )
+            if (**ap != '\0')
+                if (++ap >= &argv[31])
+                    break;
+    }
 
-     if (NCONF_get_number_e(conf, name, "gid", &gid))
-     {
-         /* change real, effective, and saved gid to gid */
-         warnx("setgid %ld", gid);
-         setresgid(gid,gid,gid);
-     }
+    /* get GID from conf and assign it to the child process */
+    if (NCONF_get_number_e(conf, name, "gid", &gid))
+    {
+        /* change real, effective, and saved gid to gid */
+        warnx("setgid %ld", gid);
+        setresgid(gid,gid,gid);
+    }
 
-     if ((groups = NCONF_get_string(conf, name, "extra_gids")))
-     {
-         ngids = 0;
-         CONF_parse_list(groups, ',', 1, &group_parse_cb, NULL);
-         gid_t gidsForProcess[ngids];
-         /* set the grouplist to gids */
-         for (i = 0; i < ngids; i++)
-         {
-             warnx("extra gid %d", gids[i]);
-             gidsForProcess[i] = gids[i];
-         }
-      
-         setgroups(ngids, gidsForProcess);
-     }
+    /* get extra GIDs from conf and assign them to the child process */
+    if ((groups = NCONF_get_string(conf, name, "extra_gids")))
+    {
+        ngids = 0;
+        CONF_parse_list(groups, ',', 1, &group_parse_cb, NULL);
+        gid_t gidsForProcess[ngids];
+        /* set the grouplist to gids */
+        for (i = 0; i < ngids; i++)
+        {
+            warnx("extra gid %d", gids[i]);
+            gidsForProcess[i] = gids[i];
+        }
+        
+        setgroups(ngids, gidsForProcess);
+    }
 
-     //if ((dir = NCONF_get_string(conf, name, "dir")))
-     //{
-     //    /* chroot into dir */
-     //    warnx("chrooting into %s for service %s", dir, name);
-     //    chdir("/jail");
-     //    chroot(dir);
-     //}
+    /* Get jail directory from conf and chroot into that directory */
+    if ((dir = NCONF_get_string(conf, name, "dir")))
+    {
+        /* chroot into dir */
+        warnx("chrooting into %s for service %s", dir, name);
+        chdir("/jail");
+        chroot(dir);
+    }
 
-     if (NCONF_get_number_e(conf, name, "uid", &uid))
-     {
-         /* change real, effective, and saved uid to uid */
-         warnx("setuid %ld", uid);
-         setresuid(uid, uid, uid);
-     }
+    /* Get uid from conf and assign it to the child process (everything before this needs root) */
+    if (NCONF_get_number_e(conf, name, "uid", &uid))
+    {
+        /* change real, effective, and saved uid to uid */
+        warnx("setuid %ld", uid);
+        setresuid(uid, uid, uid);
+    }
 
-     signal(SIGCHLD, SIG_DFL);
-     signal(SIGPIPE, SIG_DFL);
+    /* wtf is this */
+    signal(SIGCHLD, SIG_DFL);
+    signal(SIGPIPE, SIG_DFL);
 
-     execv(argv[0], argv);
-     err(1, "execv %s %s", argv[0], argv[1]);
- }
+    /* Execute the desired program (which is specified in the conf) */
+    execv(argv[0], argv);
+    err(1, "execv %s %s", argv[0], argv[1]);
+}
 
-// static int service_parse_cb(const char *name, int len, void *arg)
-// {
-//     if (len)
-//     {
-//         strncpy(svcnames[nsvcs], name, len + 1);
-//         svcnames[nsvcs][len] = 0;
-//         launch_svc((CONF *)arg, svcnames[nsvcs]);
-//     }
-//     return 1;
-// }
+static int service_parse_cb(const char *name, int len, void *arg)
+{
+    if (len)
+    {
+        strncpy(svcnames[nsvcs], name, len + 1);
+        svcnames[nsvcs][len] = 0;
+        launch_svc((CONF *)arg, svcnames[nsvcs]);
+    }
+    return 1;
+}
 
-// static int group_parse_cb(const char *gid_str, int len, void *arg)
-// {
-//     char *str_nul;
+static int group_parse_cb(const char *gid_str, int len, void *arg)
+{
+    char *str_nul;
 
-//     if (len)
-//     {
-//         if (ngids >= MAX_GIDS)
-//         {
-//             warnx("Only %d additional gids allowed", MAX_GIDS);
-//             return 1;
-//         }
-//         str_nul = strndup(gid_str, len); /* ugh, C */
-//         gids[ngids++] = strtol(str_nul, NULL, 10);
-//         free(str_nul);
-//     }
-//     return 1;
-// }
+    if (len)
+    {
+        if (ngids >= MAX_GIDS)
+        {
+            warnx("Only %d additional gids allowed", MAX_GIDS);
+            return 1;
+        }
+        str_nul = strndup(gid_str, len); /* ugh, C */
+        gids[ngids++] = strtol(str_nul, NULL, 10);
+        free(str_nul);
+    }
+    return 1;
+}
 
 /* socket-bind-listen idiom */
 static int start_server(const char *portstr)
