@@ -18,9 +18,9 @@ Executes: zookd
 Group
 Run as: 50002
 Process: zookfs
-Reads: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+Reads: zoobar, zoobar/templates, zoobar/index.cgi, zoobar/__init__.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
 Writes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
-Executes: zoobar/index.cgi, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zookfs
+Executes: zoobar, zoobar/index.cgi, zoobar/__init__.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/templates, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zookfs
 
 Group
 Run as: 50001
