@@ -36,7 +36,7 @@ Start
 Args: /authsvc/sock
 Reads: authsvc, authsvc/sock, zoobar, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
 Writes: authsvc/sock
-Executes: authsvc, zoobar
+Executes: authsvc, zoobar, zoobar/auth-server.py
 
 Group
 Process: zoobar/bank-server.py
@@ -44,7 +44,7 @@ Start
 Args: /banksvc/sock
 Reads: banksvc, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
 Writes: zoobar/db/transfer
-Executes: banksvc, zoobar, zoobar/db, zoobar/db/transfer
+Executes: banksvc, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank-server.py
 
 Group
 Process: zoobar/profile-server.py

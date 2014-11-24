@@ -16,14 +16,11 @@ def nullPermissions(prefix, whitelist):
             continue
         if matchesWhitelist(prefix, whitelist, root + "/"):
             continue 
-        os.chmod(root, 0o070)
+        os.chmod(root, 0o000)
         for f in files:
             if matchesWhitelist(prefix, whitelist, root + "/" + f):
                 continue
-            if f == 'zook.conf':
-                os.chmod(root + "/" + f, 0o070)
-            else:
-                os.chmod(root + "/" + f, 0o070)
+            os.chmod(root + "/" + f, 0o000)
 
 def setDefaultOwnerAndGroup(prefix, whitelist):
     for root, dirs, files in os.walk(prefix):
@@ -40,15 +37,15 @@ def setPermissions(configName, prefix):
     processMap, fileMap, whitelist = configInfo.processMap, configInfo.fileMap, configInfo.whitelist
     processIds = set()
     # add reserved value for group and user
-    subprocess.call(["useradd", str(RESERVEDPROCESS)])
-    subprocess.call(["groupadd", str(RESERVEDPROCESS)])
+    subprocess.call(["useradd", "-u", str(RESERVEDPROCESS), str(RESERVEDPROCESS)])
+    subprocess.call(["groupadd", "-g", str(RESERVEDPROCESS), str(RESERVEDPROCESS)])
 
     # add users and groups of the processes
     for processNode in processMap.values():
         processIds.add(processNode.processNumber)
     for processId in processIds:
-        subprocess.call(["useradd", str(processId)])
-        subprocess.call(["groupadd", str(processId)])
+        subprocess.call(["useradd", "-u", str(processId), str(processId)])
+        subprocess.call(["groupadd", "-g", str(processId), str(processId)])
 
     nullPermissions(prefix, whitelist)
     setDefaultOwnerAndGroup(prefix, whitelist)
@@ -56,12 +53,15 @@ def setPermissions(configName, prefix):
     # go through and set acls for everything
     for fileNode in fileMap.values():
         setFilePermissions(prefix, fileNode)
+
+    print 'finished setting ACLs'
+    subprocess.call(["getfacl", "/jail/zoobar/auth-server.py"])
+
     
     #chroot
     chroot(prefix)
     os.chdir('/')
     
-    print processMap.values()
     # spawn the processes
     for processNode in processMap.values():
         print 'processing', processNode.name
@@ -80,17 +80,21 @@ def setFilePermissions(prefix, fileNode):
         processPermissions[executingProcess.processNumber] = currPermissions + 'x'
     
     # actually invoke acl
+    if fileNode.name == "zoobar/auth-server.py":
+        subprocess.call(["getfacl", prefix + fileNode.name])
     for processNum, permissions in processPermissions.items():
         subprocess.call(["sudo", "setfacl", "-m" "user:{0}:{1}".format(processNum, permissions), prefix + fileNode.name])
+    if fileNode.name == "zoobar/auth-server.py":
+        subprocess.call(["getfacl", prefix + fileNode.name])
 
 def startProcess(processNode):
-    if processNode.name == "zookld":
+    if processNode.name != "zoobar/auth-server.py":
         return
     if processNode.shouldStart:
         pid = os.fork()
         if not pid == 0:
             return
-        os.chmod(processNode.name, 0o100)
+        print 'processsNumber to set for processNode', processNode.processNumber
         os.setgid(processNode.processNumber)
         os.setuid(processNode.processNumber)
         print 'uid of process:', os.getuid()
