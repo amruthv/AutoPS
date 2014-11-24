@@ -54,10 +54,6 @@ def setPermissions(configName, prefix):
     for fileNode in fileMap.values():
         setFilePermissions(prefix, fileNode)
 
-    print 'finished setting ACLs'
-    subprocess.call(["getfacl", "/jail/zoobar/auth-server.py"])
-
-    
     #chroot
     chroot(prefix)
     os.chdir('/')
@@ -80,16 +76,10 @@ def setFilePermissions(prefix, fileNode):
         processPermissions[executingProcess.processNumber] = currPermissions + 'x'
     
     # actually invoke acl
-    if fileNode.name == "zoobar/auth-server.py":
-        subprocess.call(["getfacl", prefix + fileNode.name])
     for processNum, permissions in processPermissions.items():
         subprocess.call(["sudo", "setfacl", "-m" "user:{0}:{1}".format(processNum, permissions), prefix + fileNode.name])
-    if fileNode.name == "zoobar/auth-server.py":
-        subprocess.call(["getfacl", prefix + fileNode.name])
 
 def startProcess(processNode):
-    if processNode.name != "zoobar/auth-server.py":
-        return
     if processNode.shouldStart:
         pid = os.fork()
         if not pid == 0:

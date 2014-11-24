@@ -34,20 +34,21 @@ Group
 Process: zoobar/auth-server.py
 Start
 Args: /authsvc/sock
-Reads: authsvc, authsvc/sock, zoobar, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
-Writes: authsvc/sock
+Reads: authsvc, authsvc/sock, zoobar, zoobar/auth-server.py, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py
+Writes: authsvc, authsvc/sock
 Executes: authsvc, zoobar, zoobar/auth-server.py
 
 Group
 Process: zoobar/bank-server.py
 Start
 Args: /banksvc/sock
-Reads: banksvc, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
-Writes: zoobar/db/transfer
+Reads: banksvc, banksvc/sock, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank-server.py, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py
+Writes: banksvc, banksvc/sock, zoobar/db/transfer
 Executes: banksvc, zoobar, zoobar/db, zoobar/db/transfer, zoobar/bank-server.py
 
 Group
 Process: zoobar/profile-server.py
 Args: /profilesvc/sock
-Reads: profilesvc, zoobar/rpclib.py, zoobar/sandboxlib.py, zoobar/bank_client.py, zoobar/zoodb.py, zoobar/bank.py, zoobar/debug.py, zoobar/auth_client.py
+Reads: profilesvc, zoobar/profile-server.py, zoobar/rpclib.py, zoobar/sandboxlib.py, zoobar/bank_client.py, zoobar/zoodb.py, zoobar/bank.py, zoobar/debug.py, zoobar/auth_client.py
+Writes: profilesvc, profilesvc/sock
 Executes: profilesvc
