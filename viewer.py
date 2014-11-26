@@ -22,7 +22,7 @@ class Process():
         if filename in self.files:
             self.files[filename][i] = rwx
         else:
-            accesses = ['', '', '']
+            accesses = ['-', '-', '-']
             accesses[i] = rwx
             self.files[filename] = accesses
 
@@ -160,6 +160,8 @@ def main():
                 rwx = 'r'
             elif access_type == 'modified':
                 rwx = 'w'
+            else:
+                continue
             if pid in processes:
                 processes[pid].add_file_access(filename, rwx)
             else:
