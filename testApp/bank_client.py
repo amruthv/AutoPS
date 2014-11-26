@@ -1,4 +1,3 @@
-from zoodb import *
 import rpclib
 
 def transfer(username, recipient, amount):

@@ -5,7 +5,7 @@ Process: login-server.py
 Args: /loginsvc/sock
 Start
 Reads: loginsvc, login-server.py, db, db/cred, db/cred/cred.db, rpclib.py, pbkdf2.py, bank_client.py, zoodb.py
-Writes: loginsvc, db/cred/cred.db
+Writes: loginsvc, db/cred/cred.db, db, db/cred
 Executes: loginsvc, login-server.py
 
 Group
@@ -23,3 +23,10 @@ Start
 Reads: string-server.py, db, /db/userstring, /db/userstring/userstring.db, stringsvc, zoodb.py, rpclib.py
 Writes: db/userstring/userstring.db, stringsvc
 Executes: string-server.py, stringsvc
+
+Group
+Process: repl.py
+Start
+Reads: loginsvc, banksvc, stringsvc, repl.py, login_client.py, bank_client.py, string_client.py, rpclib.py
+Writes: loginsvc, banksvc, stringsvc
+Executes: loginsvc, banksvc, stringsvc, repl.py
