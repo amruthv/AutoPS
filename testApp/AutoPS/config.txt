@@ -27,6 +27,6 @@ Executes: /, stringsvc, string-server.py, userstring.db
 Group
 Run as: 70000
 Process: repl.py
-Reads: /, loginsvc, banksvc, stringsvc, login_client.py, bank_client.py, string_client.py, rpclib.py
+Reads: /, loginsvc, banksvc, stringsvc, repl.py, login_repl_client.py, bank_repl_client.py, string_repl_client.py, rpclib.py
 Writes: /, loginsvc, banksvc, stringsvc
-Executes: /, loginsvc, banksvc, stringsvc
+Executes: /, loginsvc, banksvc, stringsvc, repl.py
