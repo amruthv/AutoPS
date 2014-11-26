@@ -8,18 +8,16 @@ import sys
 class StringRpcServer(rpclib.RpcServer):
     ## Fill in RPC methods here.
     def rpc_getString(self, username):
-        print 'username type', type(username)
-        print 'getting string for', username
         db = string_setup()
-        userstr  = db.query(UserString).get(str(username))
+        userstr  = db.query(UserString).get(username)
         return userstr.userStr
 
     def rpc_setString(self, username, s):
-        print 'set string for user {0} to {1}'.format(username, s)
         db = string_setup()
-        userstr = db.query(UserString).get(str(username))
+        userstr = db.query(UserString).get(username)
         userstr.userStr = s
         db.commit()
+        return "Success"
     
     def rpc_makeString(self, username):
         stringDb = string_setup()

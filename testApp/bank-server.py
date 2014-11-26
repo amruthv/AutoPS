@@ -14,8 +14,9 @@ class BankRpcServer(rpclib.RpcServer):
         bankdb = bank_setup()
         usernamep = bankdb.query(Bank).get(username)
         recipientp = bankdb.query(Bank).get(recipient)
+        if recipientp is None:
+            return "Failure"
         amount = int(amount)
-        print 'amount =', amount
         username_balance = usernamep.zoobars - amount
         recipient_balance = recipientp.zoobars + amount
 
@@ -25,6 +26,7 @@ class BankRpcServer(rpclib.RpcServer):
         usernamep.zoobars = username_balance
         recipientp.zoobars = recipient_balance
         bankdb.commit()
+        return "Success"
 
     def rpc_balance(self, username):
         db = bank_setup()
