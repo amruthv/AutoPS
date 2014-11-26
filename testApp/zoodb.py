@@ -26,12 +26,14 @@ class UserString(UserStringBase):
 def dbsetup(name, base):
     thisdir = os.path.dirname(os.path.abspath(__file__))
     dbdir   = os.path.join(thisdir, "db", name)
-    if not os.path.exists(dbdir):
-        try:
-            os.makedirs(dbdir)
-        except:
-            pass
+    #if not os.path.exists(dbdir):
+    #    try:
+    #        os.makedirs(dbdir)
+    #    except:
+    #        pass
+    dbdir = thisdir
     dbfile  = os.path.join(dbdir, "%s.db" % name)
+    print 'sqlite:///%s' % dbfile
     engine  = create_engine('sqlite:///%s' % dbfile,
                             isolation_level='SERIALIZABLE')
     base.metadata.create_all(engine)

@@ -63,9 +63,7 @@ cp login-server.py /jail
 cp zoodb.py /jail
 cp rpclib.py /jail
 cp pbkdf2.py /jail
-cp repl.py /jail
-
-rm -rf /jail/db
+#cp repl.py /jail
 
 python /jail/zoodb.py init-string
 python /jail/zoodb.py init-cred

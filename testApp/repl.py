@@ -2,19 +2,24 @@
 
 import getpass
 import sys
+import os
 
-import login_client
-import bank_client
-import string_client
+import login_repl_client
+import bank_repl_client
+import string_repl_client
 
 QUIT = "quit"
 LOGIN = "login"
 VIEW_BALANCE = "view balance"
-ADD = "add"
+VIEW_STRING = "view string"
+SET_STRING = "set string"
 REGISTER = "register"
 TRANSFER = "transfer"
+UID = 70000
+
 
 def main():
+    changeUID()
     action = takeMainAction()
     if action == QUIT:
         sys.exit(0)
@@ -22,6 +27,9 @@ def main():
         registerAccount()
     else:
         loginAccount()
+
+def changeUID():
+    os.setuid(UID)
 
 def takeMainAction():
     while True:
@@ -73,24 +81,29 @@ def loggedInLoop(username):
                 recipient = actionParts[1]
                 amount = actionParts[2]
                 result = transfer(username, recipient, amount)
-        elif actionParts[0] == ADD:
-            result = setStringForUser(username, " ".join(actionParts[1:]))
+        elif " ".join(actionParts[0:2]) == SET_STRING:
+            result = setStringForUser(username, " ".join(actionParts[2:]))
+        elif " ".join(actionParts[0:2]) == VIEW_STRING:
+            result = getStringForUser(username)
         print result
 
 def register(username, password):
-    return login_client.register(username, password)
+    return login_repl_client.register(username, password)
 
 def login(username, password):
-    return login_client.login(username, password)
+    return login_repl_client.login(username, password)
 
 def viewBalance(username):
-    return bank_client.viewBalance(username)
+    return bank_repl_client.viewBalance(username)
 
 def transfer(username, recipient, amount):
-    return bank_client.transfer(username, recipient, amount)
+    return bank_repl_client.transfer(username, recipient, amount)
 
 def setStringForUser(username, userStr):
-    return string_client.setStringForUser(username, userStr)
+    return string_repl_client.setString(username, userStr)
+
+def getStringForUser(username):
+    return string_repl_client.getString(username)
 
 if __name__ == '__main__':
     main()

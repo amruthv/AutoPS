@@ -8,4 +8,7 @@ def getString(username):
     with rpclib.client_connect('/stringsvc/sock') as c:
         ret = c.call('getString', username = username)
         return ret
-
+def makeString(username):
+    with rpclib.client_connect('/stringsvc/sock') as c:
+        ret = c.call('makeString', username = username)
+        return ret

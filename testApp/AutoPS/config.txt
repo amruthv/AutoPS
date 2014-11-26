@@ -4,29 +4,29 @@ Group
 Process: login-server.py
 Args: /loginsvc/sock
 Start
-Reads: loginsvc, login-server.py, db, db/cred, db/cred/cred.db, rpclib.py, pbkdf2.py, bank_client.py, zoodb.py
-Writes: loginsvc, db/cred/cred.db, db, db/cred
-Executes: loginsvc, login-server.py
+Reads: /, loginsvc, banksvc, stringsvc, login-server.py, cred.db, rpclib.py, pbkdf2.py, bank_client.py, string_client.py, zoodb.py
+Writes: /, loginsvc, banksvc, stringsvc, cred.db
+Executes: /, loginsvc, banksvc, stringsvc, login-server.py, cred.db
 
 Group
 Process: bank-server.py
 Args: /banksvc/sock
 Start
-Reads: bank-server.py, db, db/bank, db/bank/bank.db, banksvc, zoodb.py, rpclib.py
-Writes: db/bank/bank.db, banksvc
-Executes: bank-server.py, banksvc
+Reads: /, banksvc, bank-server.py, zoodb.py, rpclib.py, bank.db
+Writes: /, banksvc, bank.db
+Executes: /, banksvc, bank-server.py, bank.db
 
 Group
 Process: string-server.py
 Args: /stringsvc/sock
 Start
-Reads: string-server.py, db, /db/userstring, /db/userstring/userstring.db, stringsvc, zoodb.py, rpclib.py
-Writes: db/userstring/userstring.db, stringsvc
-Executes: string-server.py, stringsvc
+Reads: /, stringsvc, string-server.py, zoodb.py, rpclib.py, userstring.db
+Writes: /, stringsvc, userstring.db
+Executes: /, stringsvc, string-server.py, userstring.db
 
 Group
+Run as: 70000
 Process: repl.py
-Start
-Reads: loginsvc, banksvc, stringsvc, repl.py, login_client.py, bank_client.py, string_client.py, rpclib.py
-Writes: loginsvc, banksvc, stringsvc
-Executes: loginsvc, banksvc, stringsvc, repl.py
+Reads: /, loginsvc, banksvc, stringsvc, login_client.py, bank_client.py, string_client.py, rpclib.py
+Writes: /, loginsvc, banksvc, stringsvc
+Executes: /, loginsvc, banksvc, stringsvc

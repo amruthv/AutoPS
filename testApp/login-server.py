@@ -3,6 +3,7 @@
 import rpclib
 import pbkdf2
 import bank_client
+import string_client
 from zoodb import *
 
 import os
@@ -26,6 +27,7 @@ class LoginRpcServer(rpclib.RpcServer):
         if cred:
             return "Failure"
         bank_client.makeBank(username)
+        string_client.makeString(username) 
         newcred = Cred()
         salt = os.urandom(32)
         passwordHash = pbkdf2.PBKDF2(password, salt).hexread(32)
@@ -34,15 +36,9 @@ class LoginRpcServer(rpclib.RpcServer):
         newcred.salt = salt
         credDb.add(newcred)
         credDb.commit()
-        stringDb = string_setup()
-        newstring = UserString()
-        newstring.username = username
-        stringDb.add(newstring)
-        stringDb.commit()
         return "Success"        
 
 (_, sockpath) = sys.argv
 
 s = LoginRpcServer()
-print 'Made the class object now calling sockpath fork'
 s.run_sockpath_fork(sockpath)
