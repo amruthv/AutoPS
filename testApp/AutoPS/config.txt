@@ -1,3 +1,4 @@
+Chroot: /jail/
 Whitelist: AutoPS/, usr/, dev/, etc/, tmp/, lib/
 
 Group
