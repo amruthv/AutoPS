@@ -64,7 +64,7 @@ def loginAccount():
 
 def loggedInLoop(username):
     while True:
-        print("Type \"transfer (toWhom) (amount)\" to transfer money. Type \"view balance\" to view your balance. Type \"add (yourString)\" to set the string for your account. Type \"quit\" to quit.")
+        print("Type \"transfer (toWhom) (amount)\" to transfer money. Type \"view balance\" to view your balance. Type \"set string (yourString)\" to set the string for your account. Type \"view string\" to view the string for your account. Type \"quit\" to quit.")
         action = raw_input()
         actionParts = action.split(" ")
         if action == QUIT:
