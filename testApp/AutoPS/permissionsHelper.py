@@ -59,7 +59,6 @@ def setPermissions(configName, prefix):
     
     # spawn the processes
     for processNode in processMap.values():
-        print 'processing', processNode.name
         startProcess(processNode)        
 
 def setFilePermissions(prefix, fileNode):
@@ -83,11 +82,8 @@ def startProcess(processNode):
         pid = os.fork()
         if not pid == 0:
             return
-        print 'processsNumber to set for processNode', processNode.processNumber
         os.setgid(processNode.processNumber)
         os.setuid(processNode.processNumber)
-        print 'uid of process:', os.getuid()
-        print "trying to run: " + processNode.name 
         os.execv(processNode.name, [processNode.name] + processNode.args)
 prefix = "/jail/"
 setPermissions(prefix + "AutoPS/config.txt", prefix)

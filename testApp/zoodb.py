@@ -33,7 +33,6 @@ def dbsetup(name, base):
     #        pass
     dbdir = thisdir
     dbfile  = os.path.join(dbdir, "%s.db" % name)
-    print 'sqlite:///%s' % dbfile
     engine  = create_engine('sqlite:///%s' % dbfile,
                             isolation_level='SERIALIZABLE')
     base.metadata.create_all(engine)
