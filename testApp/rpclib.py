@@ -3,7 +3,6 @@ import sys
 import socket
 import stat
 import errno
-from debug import *
 
 import json
 

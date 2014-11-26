@@ -38,6 +38,9 @@ def registerAccount():
     result = register(username, password)
     if result == "Success":
         loggedInLoop(username)
+    else:
+        print "Failure to register"
+        main()
 
 def loginAccount():
     username = raw_input("Username: ")
@@ -45,6 +48,9 @@ def loginAccount():
     result = login(username, password)
     if result == "Success":
         loggedInLoop(username)
+    else:
+        print "Failure to log in"
+        main()
 
 def loggedInLoop(username):
     while True:

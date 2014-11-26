@@ -1,0 +1,54 @@
+Whitelist: usr/, dev/, etc/, tmp/, lib/
+
+Group
+Run as: 0
+Process: zookld
+Start
+Args: zook.conf
+Reads: zook.conf
+Executes:
+
+Group
+Run as: 50000
+Process: zookd
+Reads:
+Writes:
+Executes: zookd
+
+Group
+Run as: 50002
+Process: zookfs
+Reads: zoobar, authsvc, banksvc, profilesvc, zoobar/debug.py, zoobar/templates, zoobar/index.cgi, zoobar/__init__.py, zoobar/zoodb.py, zoobar/login.py, zoobar/transfer.py, zoobar/users.py, zoobar/profile.py, zoobar/index.py, zoobar/auth_client.py, zoobar/auth.py, zoobar/bank_client.py, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html, zoobar/rpclib.py, zoobar/pbkdf2.py, zoobar/bank.py
+
+Writes: zoobar/index.cgi, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/templates/index.html, zoobar/templates/login.html, zoobar/templates/users.html
+
+Executes: zoobar, authsvc, banksvc, zoobar/index.cgi, zoobar/__init__.py, zoobar/templates
+
+Group
+Run as: 50001
+Process: zookfs
+Reads: zoobar, zoobar/media, zoobar/templates, zoobar/templates/index.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
+Executes: zookfs, zoobar, zoobar/media, zoobar/templates
+
+Group
+Process: zoobar/auth-server.py
+Start
+Args: /authsvc/sock
+Reads: authsvc, authsvc/sock, zoobar, zoobar/db, zoobar/db/cred, zoobar/db/person, zoobar/auth-server.py, zoobar/rpclib.py, zoobar/auth.py, zoobar/pbkdf2.py, zoobar/zoodb.py, zoobar/debug.py, zoobar/db/cred/cred.db, zoobar/db/person/person.db
+Writes: authsvc, authsvc/sock, zoobar/db/cred, zoobar/db/person, zoobar/db/person/person.db, zoobar/db/cred/cred.db
+Executes: authsvc, zoobar, zoobar/db, zoobar/db/cred, zoobar/db/person, zoobar/auth-server.py
+
+Group
+Process: zoobar/bank-server.py
+Start
+Args: /banksvc/sock
+Reads: banksvc, banksvc/sock, zoobar, zoobar/db, zoobar/db/bank, zoobar/db/transfer, zoobar/bank-server.py, zoobar/bank.py, zoobar/auth_client.py, zoobar/debug.py, zoobar/zoodb.py, zoobar/rpclib.py, zoobar/db/transfer/transfer.db, zoobar/db/bank/bank.db
+Writes: banksvc, banksvc/sock, zoobar/db/transfer, zoobar/db/bank, zoobar/db/transfer/transfer.db, zoobar/db/bank/bank.db
+Executes: banksvc, zoobar, zoobar/db, zoobar/db/bank, zoobar/db/transfer, zoobar/bank-server.py
+
+Group
+Process: zoobar/profile-server.py
+Args: /profilesvc/sock
+Reads: profilesvc, zoobar/profile-server.py, zoobar/rpclib.py, zoobar/sandboxlib.py, zoobar/bank_client.py, zoobar/zoodb.py, zoobar/bank.py, zoobar/debug.py, zoobar/auth_client.py
+Writes: profilesvc, profilesvc/sock
+Executes: profilesvc

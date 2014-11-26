@@ -10,31 +10,34 @@ import os
 
 class BankRpcServer(rpclib.RpcServer):
     ## Fill in RPC methods here.
-    def rpc_transfer(self, sender, recipient, zoobars):
-	bankdb = bank_setup()
-	senderp = bankdb.query(Bank).get(sender)
-	recipientp = bankdb.query(Bank).get(recipient)
+    def rpc_transfer(self, username, recipient, amount):
+        bankdb = bank_setup()
+        usernamep = bankdb.query(Bank).get(username)
+        recipientp = bankdb.query(Bank).get(recipient)
+        amount = int(amount)
+        print 'amount =', amount
+        username_balance = usernamep.zoobars - amount
+        recipient_balance = recipientp.zoobars + amount
 
-	sender_balance = senderp.zoobars - zoobars
-	recipient_balance = recipientp.zoobars + zoobars
+        if username_balance < 0 or recipient_balance < 0:
+            raise ValueError()
 
-	if sender_balance < 0 or recipient_balance < 0:
-	    raise ValueError()
+        usernamep.zoobars = username_balance
+        recipientp.zoobars = recipient_balance
+        bankdb.commit()
 
-	senderp.zoobars = sender_balance
-	recipientp.zoobars = recipient_balance
-	bankdb.commit()
     def rpc_balance(self, username):
         db = bank_setup()
         person = db.query(Bank).get(username)
         return person.zoobars
+
     def rpc_make_bank(self, username):
-	bankdb = bank_setup()
-	bank = Bank()
-	bank.username = username
-	bank.zoobars = 10
-	bankdb.add(bank)
-	bankdb.commit()
+	    bankdb = bank_setup()
+	    bank = Bank()
+	    bank.username = username
+	    bank.zoobars = 10
+	    bankdb.add(bank)
+	    bankdb.commit()
 
 (_, sockpath) = sys.argv
 

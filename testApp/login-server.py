@@ -2,7 +2,8 @@
 
 import rpclib
 import pbkdf2
-import zoodb
+import bank_client
+from zoodb import *
 
 import os
 import sys
@@ -24,6 +25,7 @@ class LoginRpcServer(rpclib.RpcServer):
         cred = credDb.query(Cred).get(username)
         if cred:
             return "Failure"
+        bank_client.makeBank(username)
         newcred = Cred()
         salt = os.urandom(32)
         passwordHash = pbkdf2.PBKDF2(password, salt).hexread(32)
