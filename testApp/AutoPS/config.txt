@@ -1,20 +1,25 @@
+Whitelist: AutoPS/
+
 Group
 Process: login-server.py
+Args: /loginsvc/sock
 Start
-Reads: db, db/cred, db/cred/cred.db, loginsvc
+Reads: login-server.py, db, db/cred, db/cred/cred.db, loginsvc, rpclib.py, pbkdf2.py, bank_client.py, zoodb.py
 Writes: db/cred/cred.db, loginsvc
 Executes: login-server.py, loginsvc
 
 Group
 Process: bank-server.py
+Args: /banksvc/sock
 Start
-Reads: db, db/bank, db/bank/bank.db, banksvc
+Reads: bank-server.py, db, db/bank, db/bank/bank.db, banksvc, zoodb.py, rpclib.py
 Writes: db/bank/bank.db, banksvc
 Executes: bank-server.py, banksvc
 
 Group
 Process: string-server.py
+Args: /stringsvc/sock
 Start
-Reads: db, /db/userstring, /db/userstring/userstring.db, stringsvc
+Reads: string-server.py, db, /db/userstring, /db/userstring/userstring.db, stringsvc, zoodb.py, rpclib.py
 Writes: db/userstring/userstring.db, stringsvc
 Executes: string-server.py, stringsvc

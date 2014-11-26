@@ -12,11 +12,10 @@ def matchesWhitelist(prefix, whitelist, toCheck):
   
 def nullPermissions(prefix, whitelist):
     for root, dirs, files in os.walk(prefix):
-        if root == prefix:
-            continue
         if matchesWhitelist(prefix, whitelist, root + "/"):
             continue 
-        os.chmod(root, 0o000)
+        if root != prefix:
+            os.chmod(root, 0o000)
         for f in files:
             if matchesWhitelist(prefix, whitelist, root + "/" + f):
                 continue
@@ -81,6 +80,8 @@ def setFilePermissions(prefix, fileNode):
 
 def startProcess(processNode):
     if processNode.shouldStart:
+        if processNode.name != "login-server.py":
+            return
         pid = os.fork()
         if not pid == 0:
             return
