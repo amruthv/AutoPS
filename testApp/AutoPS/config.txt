@@ -1,12 +1,12 @@
-Whitelist: AutoPS/
+Whitelist: AutoPS/, usr/, dev/, etc/, tmp/, lib/
 
 Group
 Process: login-server.py
 Args: /loginsvc/sock
 Start
-Reads: login-server.py, db, db/cred, db/cred/cred.db, loginsvc, rpclib.py, pbkdf2.py, bank_client.py, zoodb.py
-Writes: db/cred/cred.db, loginsvc
-Executes: login-server.py, loginsvc
+Reads: loginsvc, login-server.py, db, db/cred, db/cred/cred.db, rpclib.py, pbkdf2.py, bank_client.py, zoodb.py
+Writes: loginsvc, db/cred/cred.db
+Executes: loginsvc, login-server.py
 
 Group
 Process: bank-server.py

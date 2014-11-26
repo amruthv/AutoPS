@@ -80,8 +80,6 @@ def setFilePermissions(prefix, fileNode):
 
 def startProcess(processNode):
     if processNode.shouldStart:
-        if processNode.name != "login-server.py":
-            return
         pid = os.fork()
         if not pid == 0:
             return

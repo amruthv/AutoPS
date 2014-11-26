@@ -44,4 +44,5 @@ class LoginRpcServer(rpclib.RpcServer):
 (_, sockpath) = sys.argv
 
 s = LoginRpcServer()
+print 'Made the class object now calling sockpath fork'
 s.run_sockpath_fork(sockpath)
