@@ -4,6 +4,9 @@ import subprocess
 
 RESERVEDPROCESS = 60000
 
+def chroot(path):
+    os.chroot(path)
+  
 def nullPermissions(d):
     for root, dirs, files in os.walk(d):
         os.chmod(root, 0o000)
@@ -16,26 +19,26 @@ def setDefaultOwnerAndGroup(d):
         for f in files:
             os.chown(root + "/" + f, RESERVEDPROCESS, RESERVEDPROCESS)
 
-def setPermissions(configName, dirName):
+def setPermissions(configName, zeroOutDir):
     processMap, fileMap = parseConfig.buildGraph(configName)
     processIds = set()
     # add reserved value for group and user
-    subprocess.call("useradd", str(RESERVEDPROCESS))
-    subprocess.call("groupadd", str(RESERVEDPROCESS))
+    subprocess.call(["useradd", str(RESERVEDPROCESS)])
+    subprocess.call(["groupadd", str(RESERVEDPROCESS)])
 
     # add users and groups of the processes
-    for processNode in processMap.items():
+    for processNode in processMap.values():
         processIds.add(processNode.processNumber)
     for processId in processIds:
-        subprocess.call("useradd", str(processId))
-        subprocess.call("groupadd", str(processId))
+        subprocess.call(["useradd", str(processId)])
+        subprocess.call(["groupadd", str(processId)])
 
-    nullPermissions(dirName)
-    setDefaultOwnerAndGroup(dirname)
+    nullPermissions(zeroOutDir)
+    setDefaultOwnerAndGroup(zeroOutDir)
 
     # go through and set acls for everything
-    for fileName in fileMap:
-        setPermissions(fileMap[fileName])
+    for fileNode in fileMap.values():
+        setFilePermissions(fileNode)
 
 def setFilePermissions(fileNode):
     #aggregate permissions by calling process (process p might be in reads and writes) 
@@ -43,19 +46,18 @@ def setFilePermissions(fileNode):
     for readingProcess in fileNode.reads:
         processPermissions[readingProcess.processNumber] = 'r'
     for writingProcess in fileNode.writes:
-        currPermissions = processPermissions.get(writingProcess.processNumber. '')
+        currPermissions = processPermissions.get(writingProcess.processNumber, '')
         processPermissions[writingProcess.processNumber] = currPermissions + 'w'
     for executingProcess in fileNode.executes:
-        currPermissions = processPermissions.get(executingProcess.processNumber. '')
+        currPermissions = processPermissions.get(executingProcess.processNumber, '')
         processPermissions[executingProcess.processNumber] = currPermissions + 'x'
     
     # actually invoke acl
     for processNum, permissions in processPermissions.items():
-        subprocess.call("setfacl", "-m" "user:{0}:{1}".format(processNumber, permissions), fileNode.name)
+        subprocess.call(["sudo", "setfacl", "-m" "user:{0}:{1}".format(processNum, permissions), '/jail/app/' + fileNode.name])
 
-
-setPermissions("config.txt", "/jail")
-
+setPermissions("/jail/AutoPS/config.txt", "/jail/app")
+chroot("/jail")
 
     
 
