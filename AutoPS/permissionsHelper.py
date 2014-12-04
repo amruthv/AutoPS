@@ -75,7 +75,7 @@ def startProcess(processNode):
         os.setuid(processNode.processNumber)
         print 'uid of process:', os.getuid()
         print "trying to run: " + "/jail/app/" + processNode.name 
-        os.execv(processNode.name, ["/jail/app/" + processNode.name] + processNode.args)
+        os.execv('/jail/app/' + processNode.name, ["/jail/app/" + processNode.name] + map(lambda f: '/jail/app/' + f, processNode.args))
 
 setPermissions("/jail/AutoPS/config.txt", "/jail/app")
 chroot("/jail")
