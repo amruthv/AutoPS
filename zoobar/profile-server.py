@@ -86,7 +86,7 @@ class ProfileServer(rpclib.RpcServer):
         with rpclib.RpcClient(sa) as profile_api_client:
             return sandbox.run(lambda: run_profile(pcode, profile_api_client))
 
-(_, dummy_zookld_fd, sockpath) = sys.argv
+(_, sockpath) = sys.argv
 
 s = ProfileServer()
 s.run_sockpath_fork(sockpath)

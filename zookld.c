@@ -57,8 +57,8 @@ int main(int argc, char **argv)
     }
 
     /* http server port, default 80 */
-    if (!(portstr = NCONF_get_string(conf, "zook", "port")))
-        portstr = "80";
+    //if (!(portstr = NCONF_get_string(conf, "zook", "port")))
+    portstr = "8080";
     sockfd = start_server(portstr);
     warnx("Listening on port %s", portstr);
     signal(SIGCHLD, SIG_IGN);

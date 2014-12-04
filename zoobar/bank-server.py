@@ -13,7 +13,7 @@ class BankRpcServer(rpclib.RpcServer):
         return bank.balance(username)
     def rpc_make_bank(self, username):
         return bank.make_bank(username)
-(_, dummy_zookld_fd, sockpath) = sys.argv
+(_, sockpath) = sys.argv
 
 s = BankRpcServer()
 s.run_sockpath_fork(sockpath)
