@@ -92,8 +92,8 @@ int main(int argc, char **argv)
 
     /* launch non-http services */
     /* this is bank_svc, auth_svc, etc. We can probably take this out. */
-    //if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
-    //    CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
+    if ((svcs = NCONF_get_string(conf, "zook", "extra_svcs")))
+        CONF_parse_list(svcs, ',', 1, &service_parse_cb, conf); //service_parse_cb includes a launch_svc call
 
     NCONF_free(conf);
 

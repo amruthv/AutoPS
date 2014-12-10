@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/fanotify.h>
@@ -16,8 +17,9 @@ int main(int argc, char** argv) {
   ssize_t buflen, linklen;
   struct fanotify_event_metadata *metadata;
   FILE *fp;
-  
-  cwd = getcwd(0, 0);
+
+  //cwd = getcwd(0, 0);
+  cwd = "/home/httpd/AutoPS/fanotify/test";
   fp = fopen("../log.txt", "w");
 
   CHK(fan = fanotify_init(FAN_CLASS_NOTIF, O_RDONLY), -1);
@@ -35,7 +37,6 @@ int main(int argc, char** argv) {
       sprintf(fdpath, "/proc/self/fd/%d", metadata->fd);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
-
       if ((metadata->mask & FAN_ACCESS) > 0) {
         fprintf(fp, "%s read by process %d.\n", path, (int)metadata->pid);
       }
