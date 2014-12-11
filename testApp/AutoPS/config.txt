@@ -1,24 +1,20 @@
 Group
-Process: db_setup.py
+Process: login-server.py
 Start
-Reads: db, db/cred, db/bank, db/strings
-Writes: db, db/cred, db/bank, db/strings
-Executes: db, db/cred, db/bank, db/strings
-
-Group
-Process: cred-server.py
-Start
-Reads: db, db/cred, db/cred/cred.db
-Writes: db/cred/cred.db
+Reads: db, db/cred, db/cred/cred.db, loginsvc
+Writes: db/cred/cred.db, loginsvc
+Executes: login-server.py, loginsvc
 
 Group
 Process: bank-server.py
 Start
-Reads: db, db/bank, db/bank/bank.db
-Writes: db/bank/bank.db
+Reads: db, db/bank, db/bank/bank.db, banksvc
+Writes: db/bank/bank.db, banksvc
+Executes: bank-server.py, banksvc
 
 Group
-Process: strings-server.py
+Process: string-server.py
 Start
-Reads: db, /db/strings, /db/strings/strings.db
-Writes: db/strings/strings.db
+Reads: db, /db/userstring, /db/userstring/userstring.db, stringsvc
+Writes: db/userstring/userstring.db, stringsvc
+Executes: string-server.py, stringsvc
