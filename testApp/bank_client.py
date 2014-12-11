@@ -2,18 +2,13 @@ from zoodb import *
 import rpclib
 
 @catch_err
-def transfer(sender, recipient, zoobars):
+def transfer(username, recipient, amount):
     with rpclib.client_connect('/banksvc/sock') as c:
-        ret = c.call('transfer', sender = sender, recipient = recipient, zoobars = zoobars)
+        ret = c.call('transfer', username = username, recipient = recipient, amount = amount)
         return ret
 @catch_err
-def balance(username):
+def viewBalance(username):
     with rpclib.client_connect('/banksvc/sock') as c:
         ret = c.call('balance', username = username)
         return ret
 
-@catch_err
-def make_bank(username):
-    with rpclib.client_connect('/banksvc/sock') as c:
-        ret = c.call('make_bank', username = username)
-        return ret
