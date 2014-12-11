@@ -6,19 +6,19 @@ Writes: db, db/cred, db/bank, db/strings
 Executes: db, db/cred, db/bank, db/strings
 
 Group
-Process: cred_svc.py
+Process: cred-server.py
 Start
 Reads: db, db/cred, db/cred/cred.db
 Writes: db/cred/cred.db
 
 Group
-Process: bank_svc.py
+Process: bank-server.py
 Start
 Reads: db, db/bank, db/bank/bank.db
 Writes: db/bank/bank.db
 
 Group
-Process: strings_svc.py
+Process: strings-server.py
 Start
 Reads: db, /db/strings, /db/strings/strings.db
 Writes: db/strings/strings.db
