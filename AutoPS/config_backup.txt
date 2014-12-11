@@ -1,0 +1,60 @@
+Group
+Process: zookfs
+
+Group
+Process: zookfs
+Start
+Reads: zoobar/templates/index.html, zoobar/templates/index.html, zoobar/templates/echo.html, zoobar/templates/layout.html, zoobar/templates/transfer.html, zoobar/media/lion_awake.jpg, zoobar/media/lion_sleeping.jpg, zoobar/media/zoobar.css
+
+Group
+Process: zoobar/auth-server.py
+Start
+Reads: authsvc
+Executes: authsvc
+
+Group
+Process: zoobar/bank-server.py
+Start
+Reads: bankx_svc
+Executes: banksvc
+
+Group
+Process: zoobar/profile-server.py
+Reads: profilesvc
+Executes: profilesvc
+
+
+
+
+Group
+Process: zoobar/auth.py
+Reads: zoobar/db/person/person.db
+Writes: zoobar/db/person/person.db
+Executes: zoobar/db/person
+
+Group
+Process: zoobar/bank.py
+Reads: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
+Writes: zoobar/db/person/person.db, zoobar/db/transfer/transfer.db
+Executes: zoobar/db/person, zoobar/db/transfer
+
+Group
+Process: zoobar/index.py
+Reads: zoobar/login.py, zoobar/db/person/person.db
+Writes: zoobar/db/person/person.db
+Executes: zoobar/db/person
+
+Group
+Process: zoobar/login.py
+Reads: zoobar/auth.py, zoobar/bank.py, zoobar/db/person/person.db
+Executes: zoobar/db/person
+
+Group
+Process: zoobar/transfer.py
+Reads: zoobar/login.py, zoobar/bank.py
+
+Group
+Process: zoobar/users.py
+Reads: zoobar/login.py, zoobar/bank.py, zoobar/db/person/person.db
+Executes: zoobar/db/person
+
