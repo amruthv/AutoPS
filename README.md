@@ -60,6 +60,7 @@ log.txt contains file access events in the format:
 ```
 
 Visualization
+=============
 
 After fanotify is run, simply run:
 ```
