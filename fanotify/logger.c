@@ -11,6 +11,7 @@
 int main(int argc, char** argv) {
   int fan;
   char buf[4096];
+  char pname[1024];
   char fdpath[32];
   char path[PATH_MAX + 1];
   char * cwd;
@@ -34,7 +35,13 @@ int main(int argc, char** argv) {
         printf("Queue overflow!\n");
         continue;
       }
+      // int ret1 = system("ps -p 8076 -o comm= > ../log.txt");
       sprintf(fdpath, "/proc/self/fd/%d", metadata->fd);
+      // snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../log.txt");
+      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", 8076, " -o comm=");
+      printf("%d: ", (int)metadata->pid);
+      fflush(stdout);
+      int ret = system(pname);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
       if ((metadata->mask & FAN_ACCESS) > 0) {
