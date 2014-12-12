@@ -1,0 +1,15 @@
+Fanotify allows the user to set a directory as a mount point to watch.
+
+Use the following command to set a mount point:
+sudo mount --bind <dir> <dir>
+
+Then run:
+sudo ./logger
+
+Output is created in logger's parent directory, in map.txt and log.txt.
+map.txt contains (pid, process name) pairs in the format:
+<pid>: <process name>
+log.txt contains file access events in the format:
+<filename> <"read"/"modified"/"opened"/"closed"> by process <pid>.
+
+

@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
   FILE *fp2;
 
   //cwd = getcwd(0, 0);
-  cwd = "/home/httpd/AutoPS/fanotify/test";
+  cwd = "./test";
   fp = fopen("../log.txt", "w");
 
   CHK(fan = fanotify_init(FAN_CLASS_NOTIF, O_RDONLY), -1);
