@@ -1,0 +1,18 @@
+## Place your answers here.
+Exercise 2
+Exploit 2a overflows the "value" buffer in http_request_headers.
+Exploit 2b overflows the pn bugger in http_serve to write to the handler function pointer.
+
+Exercise 3
+
+The exploits found in exercise 1 that don't rely on overwriting the handler function pointer can also use this same approach. This exploit simply overwrote a return address and jumped to shellcode embedded at the beginning of the buffer that overflowed. As such any technique that overwrites the return address can use this exploit. The only one that didn't was the function pointer overwrite of handler in http_serve.
+
+Exercise 4
+In isolation, each vulnerability we found in exercise 1 is subject to similar attacks. In 4a and 4b we have shown the ability to break the system using both a return into libc as well as overwriting a function pointer to call into libc. These generalized approaches will work on the bugs in exercise 1 because they fall into the same buffer overflow categories.
+
+Exercise 5
+Vulnerability 1:
+One huge vulnerability is the ability to set arbitrary environment variables. Looking at http.c:166-168 it is possible to write arbitrary environment variables. Even worse we can overwrite existing environment variables. The big reason this is an issue is that if future code relies on any of these environment variables, we can divert the flow of code and make it execute particular behavior. The easiest way to fix this is to set some requirements on what types of inputs you're willing to store as environment variables. Another step in the right direction is to not overwrite current environment variables. The best solution is to not overwrite any in the first place.
+
+Vulnerability 2:
+Another bug related but not directly correlated to buffer overflows is the lack of privelege separation. Specifically, we have illustrated being able to delete a file in a directory one up from where the web points are hosted. Really, the entire process should be chrooted such that the rest of the file system is not exposed and these types of issues can be more reasonably avoided.  

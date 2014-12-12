@@ -1,0 +1,3 @@
+/home/httpd/AutoPS/fanotify/test/hi.txt opened by process 12259.
+/home/httpd/AutoPS/fanotify/test/hi.txt read by process 12259.
+/home/httpd/AutoPS/fanotify/test/hi.txt closed by process 12259.

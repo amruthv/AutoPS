@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/fanotify.h>
@@ -10,14 +11,17 @@
 int main(int argc, char** argv) {
   int fan;
   char buf[4096];
+  char pname[1024];
   char fdpath[32];
   char path[PATH_MAX + 1];
   char * cwd;
   ssize_t buflen, linklen;
   struct fanotify_event_metadata *metadata;
   FILE *fp;
-  
-  cwd = getcwd(0, 0);
+  FILE *fp2;
+
+  //cwd = getcwd(0, 0);
+  cwd = "./test";
   fp = fopen("../log.txt", "w");
 
   CHK(fan = fanotify_init(FAN_CLASS_NOTIF, O_RDONLY), -1);
@@ -32,10 +36,17 @@ int main(int argc, char** argv) {
         printf("Queue overflow!\n");
         continue;
       }
+      // int ret1 = system("ps -p 8076 -o comm= > ../log.txt");
       sprintf(fdpath, "/proc/self/fd/%d", metadata->fd);
+      // snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../log.txt");
+      fp2 = fopen("../map.txt", "a");
+      fprintf(fp2, "%d: ", (int)metadata->pid);
+      fflush(fp2);
+      fclose(fp2);
+      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../map.txt");
+      int ret = system(pname);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
-
       if ((metadata->mask & FAN_ACCESS) > 0) {
         fprintf(fp, "%s read by process %d.\n", path, (int)metadata->pid);
       }

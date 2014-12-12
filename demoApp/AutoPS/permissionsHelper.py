@@ -4,7 +4,7 @@ import subprocess
 
 RESERVEDPROCESS = 60000
 
-def chroot(path):
+def chrootIntoDir(path):
     os.chroot(path)
 
 def matchesWhitelist(prefix, whitelist, toCheck):
@@ -12,11 +12,10 @@ def matchesWhitelist(prefix, whitelist, toCheck):
   
 def nullPermissions(prefix, whitelist):
     for root, dirs, files in os.walk(prefix):
-        if root == prefix:
-            continue
         if matchesWhitelist(prefix, whitelist, root + "/"):
             continue 
-        os.chmod(root, 0o000)
+        if root != prefix:
+            os.chmod(root, 0o000)
         for f in files:
             if matchesWhitelist(prefix, whitelist, root + "/" + f):
                 continue
@@ -32,9 +31,8 @@ def setDefaultOwnerAndGroup(prefix, whitelist):
                 continue
             os.chown(root + "/" + f, RESERVEDPROCESS, RESERVEDPROCESS)
 
-def setPermissions(configName, prefix):
-    configInfo = parseConfig.processConfig(configName)
-    processMap, fileMap, whitelist = configInfo.processMap, configInfo.fileMap, configInfo.whitelist
+def setPermissions(configInfo):
+    processMap, fileMap, whitelist, chroot = configInfo.processMap, configInfo.fileMap, configInfo.whitelist, configInfo.chroot
     processIds = set()
     # add reserved value for group and user
     subprocess.call(["useradd", "-u", str(RESERVEDPROCESS), str(RESERVEDPROCESS)])
@@ -47,6 +45,12 @@ def setPermissions(configName, prefix):
         subprocess.call(["useradd", "-u", str(processId), str(processId)])
         subprocess.call(["groupadd", "-g", str(processId), str(processId)])
 
+    if chroot != '':
+        prefix = chroot
+    else:
+        # if no chroot go up one directory for nulling out permissions since we are in AutoPS directory
+        prefix = './../'
+
     nullPermissions(prefix, whitelist)
     setDefaultOwnerAndGroup(prefix, whitelist)
 
@@ -55,12 +59,15 @@ def setPermissions(configName, prefix):
         setFilePermissions(prefix, fileNode)
 
     #chroot
-    chroot(prefix)
-    os.chdir('/')
+    chrootIntoDir(chroot)
+    
+    if chroot != '':
+        os.chdir('/')
+    else:
+        os.chdir('./..')
     
     # spawn the processes
     for processNode in processMap.values():
-        print 'processing', processNode.name
         startProcess(processNode)        
 
 def setFilePermissions(prefix, fileNode):
@@ -84,11 +91,9 @@ def startProcess(processNode):
         pid = os.fork()
         if not pid == 0:
             return
-        print 'processsNumber to set for processNode', processNode.processNumber
         os.setgid(processNode.processNumber)
         os.setuid(processNode.processNumber)
-        print 'uid of process:', os.getuid()
-        print "trying to run: " + processNode.name 
         os.execv(processNode.name, [processNode.name] + processNode.args)
-prefix = "/jail/"
-setPermissions(prefix + "AutoPS/config.txt", prefix)
+
+configInfo = parseConfig.processConfig('config.txt')
+setPermissions(configInfo)

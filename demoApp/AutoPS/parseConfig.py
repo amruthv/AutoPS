@@ -2,11 +2,11 @@ processNumber = 61000
 RESERVEDPROCESS = 60000
 
 class ConfigInformation(object):
-    def __init__(self, processMap, fileMap, whitelist):
+    def __init__(self, processMap, fileMap, whitelist, chroot):
         self.processMap = processMap
         self.fileMap = fileMap
         self.whitelist = whitelist
-
+        self.chroot = chroot
 class Node(object):
     def __init__(self, name):
         self.name = name
@@ -42,6 +42,14 @@ class ProcessNode(Node):
         return "name: {0}, processNumber: {1}".format(self.name, self.processNumber)
         return "name: {0}, processNumber: {1}, args: {2} shouldStart: {3},  reads: {4}, writes: {5}, executes:{6}".format(self.name, self.processNumber, self.args, self.shouldStart, ','.join(node.name for node in self.reads), ','.join(node.name for node in self.writes), ','.join(node.name for node in self.executes))
 
+def getChroot(lines):
+    chrootPrefix = "Chroot: "
+    chrootLines = [line.strip() for line in lines if line.startswith(chrootPrefix)]
+    assert(len(chrootLines) == 0 or len(chrootLines) == 1)
+    if len(chrootLines) == 0:
+        return ''
+    chroot = chrootLines[0][len(chrootPrefix):]
+    return chroot
 
 def getWhitelist(lines):
     whitelistPrefix = "Whitelist: "
@@ -56,8 +64,9 @@ def processConfig(fileName):
     f = open(fileName, 'r')
     lines = [line.strip() for line in f.readlines() if line != '\n']
     whitelist = getWhitelist(lines)
+    chroot = getChroot(lines)
     processMap, fileMap = processGroups(lines) 
-    return ConfigInformation(processMap, fileMap, whitelist)
+    return ConfigInformation(processMap, fileMap, whitelist, chroot)
 
 def processGroups(lines):
     groupChunks = [i for i, line in enumerate(lines) if line.startswith('Group')]
@@ -145,6 +154,7 @@ def processLinesForFile(linesForFile, processMap, fileMap):
 
 if __name__ == '__main__':
     configInfo =  processConfig('config.txt')
-    processMap = configInfo.processMap
+    print configInfo.chroot
+    #processMap = configInfo.processMap
     #for name in processMap.keys():
     #    print processMap[name]

@@ -1,0 +1,33 @@
+Chroot: /jail/
+Whitelist: AutoPS/, usr/, dev/, etc/, tmp/, lib/
+
+Group
+Process: login-server.py
+Args: /loginsvc/sock
+Start
+Reads: /, loginsvc, banksvc, stringsvc, login-server.py, cred.db, rpclib.py, pbkdf2.py, bank_client.py, string_client.py, zoodb.py
+Writes: /, loginsvc, banksvc, stringsvc, cred.db
+Executes: /, loginsvc, banksvc, stringsvc, login-server.py, cred.db
+
+Group
+Process: bank-server.py
+Args: /banksvc/sock
+Start
+Reads: /, banksvc, bank-server.py, zoodb.py, rpclib.py, bank.db
+Writes: /, banksvc, bank.db
+Executes: /, banksvc, bank-server.py, bank.db
+
+Group
+Process: string-server.py
+Args: /stringsvc/sock
+Start
+Reads: /, stringsvc, string-server.py, zoodb.py, rpclib.py, userstring.db
+Writes: /, stringsvc, userstring.db
+Executes: /, stringsvc, string-server.py, userstring.db
+
+Group
+Run as: 70000
+Process: repl.py
+Reads: /, loginsvc, banksvc, stringsvc, repl.py, login_repl_client.py, bank_repl_client.py, string_repl_client.py, rpclib.py
+Writes: /, loginsvc, banksvc, stringsvc
+Executes: /, loginsvc, banksvc, stringsvc, repl.py

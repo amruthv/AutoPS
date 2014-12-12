@@ -1,0 +1,56 @@
+[http.c:165]
+We write the contents of buf into envvar if CONTENT-TYPE and CONTENT-LENGTH are headers not at the beginning of the string. However, the size of envvar is much smaller than that of buf. So if the contents of buf are big (ie many many bytes before a null character) envvar will overflow.
+Input: GET / HTTP/1.0\r\nsomeTextContent-Type:[A * 2000]\r\notherText[A*2000]\r\n\r\n
+This vulnerability would be prevented by a canary. 
+
+sprintf(envvar, "HTTP_%s", buf);
+
+[http.c:282]
+The pn buffer of size 1024 is having the const char* name appended to it by the call to strcat. There is a call to http_serve that references the environment variable REQUEST_URI but there is no guarantee that the size of the environment variable will be less than or equal to 1024. In fact it can be up to 2048 bytes. Thus we could overflow the pn buffer.
+Input: GET /[A*2000] HTTP/1.0\r\n\r\n this buffer would overflow.
+A canary would not prevent this attack because we don't rely on the return address to complete the exploit. We've overwritten the handler function pointer and can now redirect the flow of the program.
+
+Caller from zookfs.c
+    http_serve(sockfd, getenv("REQUEST_URI"));
+in http_serve
+    char pn[1024];
+    strcat(pn, name);
+
+[http.c:344]
+From above, we already know that pn buffer can overflow. This buffer is passsed to the function dir_join, where it is copied into the buffer dst. The function call to dst is 1024 bytes. Thus if pn overflowed with no null bytes for its first 1024 bytes, the dst buffer can overflow as well. Moreover, apppending more material to dst could be problematic even in the event of no overflow while copying dirname to dst. Consider the case where dirname is exactly 1024 bytes and then we add on a "/" character and a filename. Then we have certainly exceeded the length of the buffer.
+Input: Get /[A*2000] HTTP/1.0\r\n
+Canaries would help since we're trying to overwrite the return address 
+
+Caller
+    dir_join(name, pn, indices[i]);
+dir_join
+    strcpy(dst, dirname);
+    if (dst[strlen(dst) - 1] != '/')
+        strcat(dst, "/");
+    strcat(dst, filename);
+
+[http.c:437]
+When we url_decode, we are copying from a src array into a dst array. However we only break from this iterative copying process when we copy a null byte from src into dst. So if url_decode does not see a null byte for a long time this function will copy a lot from src into dst. When we url_decode, we are copying from a src array into a dst array. However we only break from this iterative copying process when we copy a null byte from src into dst. So if url_decode does not see a null byte for a long time this function will copy a lot from src into dst. url_decode writes to reqpath from sp1, the section after the verb in the HTTP request. If the resource is very long (the entire request line can be 8192 bytes) and has no null bytes, then the 2048 reqpath buffer can be overflowed.
+Input: Get /[A*4000] HTTP/1.0\r\n
+Canaries would help here as well since the return address will be written to.
+
+Caller(NOTE: this is from http_request_line)
+    url_decode(reqpath, sp1);
+url_decode
+    else
+    {
+        *dst = *src;
+        src++;
+
+        if (*dst == '\0')
+            break;
+    }
+
+[http.c:159]
+While parsing the HTTP headers, we try and decode the cookie into the buffer val. The entire header can be 8192 bytes so the cookie can be quite long. As such the cookie when being copied to value can cause it to overflow similarly to the issue we saw above. rather than copying the url_decode from above, simply consult the code above. The caller is shown below and referenced in the code line number.
+NOTE: this is from http_request_headers (overflowing a different buffer)
+Input: Get / HTTP/1.0\r\nCookie: [A*1500]\r\n\r\n
+Canaries would prevent this vulnerability.
+
+    char value[512];
+    url_decode(value, sp);
