@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
       fprintf(fp2, "%d: ", (int)metadata->pid);
       fflush(fp2);
       fclose(fp2);
-      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", 8076, " -o comm= >> ../map.txt");
+      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../map.txt");
       int ret = system(pname);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
