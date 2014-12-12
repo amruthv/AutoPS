@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
   ssize_t buflen, linklen;
   struct fanotify_event_metadata *metadata;
   FILE *fp;
+  FILE *fp2;
 
   //cwd = getcwd(0, 0);
   cwd = "/home/httpd/AutoPS/fanotify/test";
@@ -38,9 +39,11 @@ int main(int argc, char** argv) {
       // int ret1 = system("ps -p 8076 -o comm= > ../log.txt");
       sprintf(fdpath, "/proc/self/fd/%d", metadata->fd);
       // snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../log.txt");
-      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", 8076, " -o comm=");
-      printf("%d: ", (int)metadata->pid);
-      fflush(stdout);
+      fp2 = fopen("../map.txt", "a");
+      fprintf(fp2, "%d: ", (int)metadata->pid);
+      fflush(fp2);
+      fclose(fp2);
+      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", 8076, " -o comm= >> ../map.txt");
       int ret = system(pname);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
