@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
   //cwd = getcwd(0, 0);
   cwd = "./test";
-  fp = fopen("../log.txt", "w");
+  fp = fopen("log.txt", "w");
 
   CHK(fan = fanotify_init(FAN_CLASS_NOTIF, O_RDONLY), -1);
   CHK(fanotify_mark(fan, FAN_MARK_ADD | FAN_MARK_MOUNT, 
@@ -39,11 +39,11 @@ int main(int argc, char** argv) {
       // int ret1 = system("ps -p 8076 -o comm= > ../log.txt");
       sprintf(fdpath, "/proc/self/fd/%d", metadata->fd);
       // snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../log.txt");
-      fp2 = fopen("../map.txt", "a");
+      fp2 = fopen("map.txt", "a");
       fprintf(fp2, "%d: ", (int)metadata->pid);
       fflush(fp2);
       fclose(fp2);
-      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> ../map.txt");
+      snprintf(pname, sizeof pname, "%s%d%s", "sudo ps -p ", (int)metadata->pid, " -o comm= >> map.txt");
       int ret = system(pname);
       CHK(linklen = readlink(fdpath, path, sizeof(path) - 1), -1);
       path[linklen] = '\0';
